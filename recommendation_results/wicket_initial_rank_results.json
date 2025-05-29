@@ -1,0 +1,146 @@
+[
+    {
+        "query_commit": "d86d00967a024a64172cf6e815cc2679ae0c2404",
+        "target_commit": "b7630fd160e6e710f1ed7cae72c65758b926d9ce",
+        "rank": 12468,
+        "similarity_score": 0.7815554141998291
+    },
+    {
+        "query_commit": "d86d00967a024a64172cf6e815cc2679ae0c2404",
+        "target_commit": "5c42e992b0cffbdd1e65cb7dbdf5633b156bb5b9",
+        "rank": 5251,
+        "similarity_score": 0.9668246507644653
+    },
+    {
+        "query_commit": "caeca773eb0a222f6a052f702ed712aa24fb5510",
+        "target_commit": "e0335bbb5706c489d6039f250215a53cdc6a6797",
+        "rank": 3101,
+        "similarity_score": 0.9618048667907715
+    },
+    {
+        "query_commit": "2e8d465c31cf5024c471e1431042c329a822d2fe",
+        "target_commit": "e3832fd8276d56be8b678d5d0ebbf5ddd1673c4f",
+        "rank": 6745,
+        "similarity_score": 0.9757107496261597
+    },
+    {
+        "query_commit": "2e8d465c31cf5024c471e1431042c329a822d2fe",
+        "target_commit": "b80674c108f8dfd125d022ddf9a1fa3d94eac5ff",
+        "rank": 1968,
+        "similarity_score": 0.9941531419754028
+    },
+    {
+        "query_commit": "91d2bd9e907ea01b9b402b9a5cbbd62c705668aa",
+        "target_commit": "13461607f0e6745adf99ff0b8f400348aecb9883",
+        "rank": 1958,
+        "similarity_score": 0.9956955909729004
+    },
+    {
+        "query_commit": "91d2bd9e907ea01b9b402b9a5cbbd62c705668aa",
+        "target_commit": "cb59bc87d4ed930f83574e9cd0a4d866fc08d611",
+        "rank": 4282,
+        "similarity_score": 0.955862283706665
+    },
+    {
+        "query_commit": "7b31effcb460a0a88cbe8c89a277e999fb54d38e",
+        "target_commit": "fdeef289741651cdca700d2fce34fc9d00bcfa66",
+        "rank": 4767,
+        "similarity_score": 0.9771373867988586
+    },
+    {
+        "query_commit": "077e1c3d54d044ccfe7b56cc4decf4baf2cc6717",
+        "target_commit": "1aab37b6346cd0fcaccec72b8ea51856b34cce41",
+        "rank": 9054,
+        "similarity_score": 0.8370276093482971
+    },
+    {
+        "query_commit": "077e1c3d54d044ccfe7b56cc4decf4baf2cc6717",
+        "target_commit": "5269cf59565de653260d0ac5426cb1acb061b4c8",
+        "rank": 11274,
+        "similarity_score": 0.7954165935516357
+    },
+    {
+        "query_commit": "9148a8cf5384cac57ff1129540d028524e8956b7",
+        "target_commit": "0c4e96a828871e5e61a3c1cc1d2b5e8f8a1fe8ad",
+        "rank": 15267,
+        "similarity_score": 0.2818823456764221
+    },
+    {
+        "query_commit": "b6b9dc8d53fa493fc9812acde062414a7e93800b",
+        "target_commit": "843b76b1d036cd2c90d19776cdc5f2c1aa71068c",
+        "rank": 9592,
+        "similarity_score": 0.8070289492607117
+    },
+    {
+        "query_commit": "2b8ba3a6ef2dff3bb66ef1930f2b5773c23e069e",
+        "target_commit": "2135f7b7d2e77d1c7a70cb03da744e0f4ef2de29",
+        "rank": 16691,
+        "similarity_score": -0.7737283706665039
+    },
+    {
+        "query_commit": "ecdfc124453ca614178d33d0c119d4e71872cfef",
+        "target_commit": "af7d79ba88d623e9d91e47ae383149a01f49d2f1",
+        "rank": 12642,
+        "similarity_score": 0.7587671279907227
+    },
+    {
+        "query_commit": "8593ce85a8bfe80eead55ed1fa46c112ebb5d128",
+        "target_commit": "8206db297d1827eef482d9563b2c4f5d4facd432",
+        "rank": 1454,
+        "similarity_score": 0.9931120872497559
+    },
+    {
+        "query_commit": "a293ddf757613a06a6558336047e4a4308b0f1b9",
+        "target_commit": "41e4037355b0739ec5ba01a1db7181613194348f",
+        "rank": 10447,
+        "similarity_score": 0.8450219035148621
+    },
+    {
+        "query_commit": "a293ddf757613a06a6558336047e4a4308b0f1b9",
+        "target_commit": "62a6f97ca913853194c535444b31e9a69a88e9d2",
+        "rank": 7010,
+        "similarity_score": 0.9740810990333557
+    },
+    {
+        "query_commit": "caeca773eb0a222f6a052f702ed712aa24fb5510",
+        "target_commit": "abd958d4eb128056bc7e57ab943dfc69c23b3925",
+        "rank": 3910,
+        "similarity_score": 0.9526458382606506
+    },
+    {
+        "query_commit": "197068dd87cd0b167c2f953560a94d320398a038",
+        "target_commit": "95ed0553bfca5bdf73fd287612836527d5694269",
+        "rank": 1229,
+        "similarity_score": 0.9833797812461853
+    },
+    {
+        "query_commit": "197068dd87cd0b167c2f953560a94d320398a038",
+        "target_commit": "ec00704cca20fe1d4c1f32e4ab859a2b173d297d",
+        "rank": 1232,
+        "similarity_score": 0.9833535552024841
+    },
+    {
+        "query_commit": "197068dd87cd0b167c2f953560a94d320398a038",
+        "target_commit": "6b778571996073c71a4b251d1b8085ff285aa318",
+        "rank": 335,
+        "similarity_score": 0.9938971400260925
+    },
+    {
+        "query_commit": "2869c58bf530b4e9ff1efafed69ff788d7cbcec8",
+        "target_commit": "700d716b8b6a2d43e5e422896ed8043ea7d17b49",
+        "rank": 5592,
+        "similarity_score": 0.9194507002830505
+    },
+    {
+        "query_commit": "130377f5c7620974a5b8d4ba7b3e4c28ed2e0f03",
+        "target_commit": "6b353fbe03145e4e04d4f30037e48b7c40b65e3f",
+        "rank": 4760,
+        "similarity_score": 0.8064292669296265
+    },
+    {
+        "query_commit": "2c087d9215c0ee41c018591bfbcc2c08bd3ac852",
+        "target_commit": "fdbb57b11bb5d643b49e57bc19056e70db43995e",
+        "rank": 5649,
+        "similarity_score": 0.9584587812423706
+    }
+]

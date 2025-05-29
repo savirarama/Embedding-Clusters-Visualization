@@ -1,0 +1,257 @@
+[
+    {
+        "queryCommit": "d86d00967a024a64172cf6e815cc2679ae0c2404",
+        "recommendedCommit": [
+            "56855600ef0edede4242f88a4860a7088939f022",
+            "4d1f609265c474b0d3f1ddd460d4082ba51097a6",
+            "610fef0719ee27166e890a2cbc0bfd590379915f",
+            "0f8a81fb9aceffaa8fc035f203d3e27829a382bb",
+            "fe0bcdb0b67d991f1f05a88e639623a2331faf9d",
+            "8b8cf005c90d8e9e4b00ea0ea0439b62dab0cd11",
+            "6b62b86ae853150fda617e393d269c9fb9e17a77",
+            "7ac9ccdee5ae1af64b3ee7f2afddfafc50315807",
+            "ad872d1ab71fe20a13245fd20b50249b4061809c",
+            "dc356b95381bf1ebfbe317f8e5bba6e231a610d8"
+        ]
+    },
+    {
+        "queryCommit": "caeca773eb0a222f6a052f702ed712aa24fb5510",
+        "recommendedCommit": [
+            "e04ea849328e92defa135fdc7bc7484a29c447e8",
+            "8c95f3fe631a853df87408e0f2ddf5cec469a35d",
+            "065cb0398fbcb5ca3e83f9ed614756ab81de13f3",
+            "fa322ba5b4a063df41ff1614e8073afc795abf9c",
+            "929e12839917135fb238fc602193d3e98d713ca9",
+            "dbbdf1cea731cfc5c558fa84e2d32a6a49c8f6ad",
+            "25da62c109146a0dc76a0cb37595910b2f7be856",
+            "8957fa2637a0b5a2ddd0aebbc53f261bcce79528",
+            "ddfef631e242f303c52b6990ee607e0b262bbe14",
+            "ffe2781ab894f61586af95787a0f98ddb8866bb0"
+        ]
+    },
+    {
+        "queryCommit": "2e8d465c31cf5024c471e1431042c329a822d2fe",
+        "recommendedCommit": [
+            "cb325d5cb8e80035d35f52e2b7a374b785c19520",
+            "2a46312e81cedfa64b65d7ae4777c67c9fc1121e",
+            "c07f5d3da06d6a8362d6c5b353ceb31e0b40faa7",
+            "7d6d5118592105992fe505f6f2ea44b67dccdcb0",
+            "efaecfb8fa0c7cdcf0a1a9320ec65ddf0d18a71e",
+            "a0627da7e46ac89e71d4f8052b4a5d45803c4b1b",
+            "c04016e1d79f16d2550d296ac3823f3a222e7982",
+            "c010e2d9643c467feff09071c3a5b721e40582be",
+            "782953abeb321c6e5ca73c7c59ec866019464636",
+            "64ad940fb273e2a3a5d6d5e82425a9d46b6e798e"
+        ]
+    },
+    {
+        "queryCommit": "91d2bd9e907ea01b9b402b9a5cbbd62c705668aa",
+        "recommendedCommit": [
+            "f8211748b39504e1cba560afc9d0c8d3e4db1e7d",
+            "1ccb57d741e1467b2ba296e4c6d135a558c1565b",
+            "66ae9bdb73fc937bb2ab6fe8b3046b483afab6bc",
+            "50724c0fe3755a12401afac4916a90707a37cdc7",
+            "69f472854384ec6da408831d7f3e2c214fa8670d",
+            "565e11298bcc2ab1818d8273429063e47f2411fe",
+            "e53a25a23fc3c2640b8366f2a4fec0d1ad131ac5",
+            "d74e4660cc546d845f62f1aba778e6a554373b10",
+            "f86a3bae6b112a85dd6eb82133cbc5b3776e1b91",
+            "4cd6ae3656489a30223f2e9c6cc7982ca094916e"
+        ]
+    },
+    {
+        "queryCommit": "7b31effcb460a0a88cbe8c89a277e999fb54d38e",
+        "recommendedCommit": [
+            "09f0896a60d041214a5c3c1eb5ed0bccbe8f1f7d",
+            "dd7c3435118b29eb75a85c5dfa901e8dd7e63b99",
+            "e5e744ef35eacb97e9c74453cb10845a601010e0",
+            "4b62f6f80bef870457343b3ec5a80a1cbc7c9cae",
+            "44bfe092dd7952ea5ece0387744200f91357afd1",
+            "5cdd8624c28814dfb7920bffcadda28eeccb0006",
+            "85797065096f7d8e6f1a66e1dd574cef5143a731",
+            "9cf3710a1f2b0bd8d9dea91de8790f4ad73f7d71",
+            "6eee3a8bcec919e5d0acb08589a20b08db6a41ab",
+            "a5b34d75fa82d7d522ff8516f4cbb3082d9ed587"
+        ]
+    },
+    {
+        "queryCommit": "077e1c3d54d044ccfe7b56cc4decf4baf2cc6717",
+        "recommendedCommit": [
+            "8b4e0c010b9bd8ae57e1e7fed8d49d5c4ee857dd",
+            "b8d6c23c662912a358b4da2da9828ddbbbe1cba2",
+            "4497d7ea637aed8ca6e2352c517aea71b840a1cf",
+            "f5592e71d0aa3f0c1bbcf770fc99092d44a24910",
+            "105a4f2f9de6e643c5196bd15ef194f9290d34a1",
+            "d5931b695f974ad4d1e9a83ca0a35faeb2ce3f7f",
+            "c451d4cbc94e052c36af1c99652d9b55ca78f10b",
+            "fc7a5982224adcb1ebdc8c13a6c63f4f744e28b7",
+            "87d2b3e92f6c822461ff6c5f7f5f2402a007d481",
+            "69eed82db533f7de8b70c4a2ed808716941c3303"
+        ]
+    },
+    {
+        "queryCommit": "9148a8cf5384cac57ff1129540d028524e8956b7",
+        "recommendedCommit": [
+            "53c5dc67316d49b147e61efe2c493adc5434ed85",
+            "8bcfc11324293d750861f93789cd6797ab874aac",
+            "1789003da1f7895d086d43a02cac551b08c8765d",
+            "506ada4571bc0bbc0508710ee4e2fbe208233a15",
+            "1695328525e940d4ca4518d1df3275bf0c0d609e",
+            "4d087571b87459a9fcf32291e8cb8d595eb274e0",
+            "e9e0456d4583af7de1b755d3759ff8c0e8354b62",
+            "ce66c242ad83266a4f5c01363b4b446138b054e9",
+            "02d586477a0e9dabf82ab839bd53499c1b78d616",
+            "43c9462ed843c7637d53fc87da19287e6a822ed7"
+        ]
+    },
+    {
+        "queryCommit": "b6b9dc8d53fa493fc9812acde062414a7e93800b",
+        "recommendedCommit": [
+            "0644ac7465c6ffc8e7f610d9fc94e57e3d3367d9",
+            "8db230456e21a4526058d586168db02f3e203e9e",
+            "a6db0e51e98e0d245da9806977ab33cfab06326d",
+            "b519a24ef85dc09bd4af132337cbef848a054896",
+            "b7dd44817d3d225dca9e65f1e34d2c6a3ef2bde1",
+            "53fe8d59d0bdbf676377c559245ac3f829562eb9",
+            "3fb956713b0bf664d3e8809f0e31e33ce9a6ca3c",
+            "e350f19ef60835c527e87579eb4eb035bcc8994c",
+            "aefb8c5437142aafe5f3de9b5a598d01f7804b82",
+            "7f9e0558f1035d0f8634aed1d650867b757cc3a8"
+        ]
+    },
+    {
+        "queryCommit": "2b8ba3a6ef2dff3bb66ef1930f2b5773c23e069e",
+        "recommendedCommit": [
+            "01ca90a33df3ef1d882268bc03c2a97671984e39",
+            "abc88a72f3154e79c9c931bf1fcc41f62e52b7c9",
+            "25d6a7ac2cb1beac388e59f765334ab77a8acc89",
+            "7ac50489cc826fc07dc6d4ae84ac366eb0d18c43",
+            "3106380987a7fed745754fef87fbba8051ec3f2b",
+            "f67d25bfe549b87bf4e5161e340a37cca1e466fb",
+            "ad11f1277684165e64759b10d3c14c40cbe2e79d",
+            "388aaf2c98c08e90c66a682d54448349e18fee30",
+            "39e731510cd3084d6109cb7e126ececc5bdf7da0",
+            "0f811b198cd9fdf2c1b9f7f532fd2321a537c262"
+        ]
+    },
+    {
+        "queryCommit": "ecdfc124453ca614178d33d0c119d4e71872cfef",
+        "recommendedCommit": [
+            "9a58bc4fbcd8d2fc3e61acd75e6e981ed7c97fb1",
+            "465331e094fb0e9bbb7eb63578654e19550b820e",
+            "5ac45da36c81c2d6c28fdae9134bca9e1facdd1e",
+            "d5de709ff872b8d67306d0124e4157beb5c84ac6",
+            "6f491eafecf2a79aa436cae6b64cdd6cc756aca3",
+            "7b84e882e387637e484a981fd776bdbc815f42d2",
+            "594b7010711a470f2bd3883321d5ae388c71f902",
+            "11baed6d699c513a9afdd7fe64d5e8384f962941",
+            "1d808689801ae4ade14594b84e745e87a2026e26",
+            "16e44ce9879ded22e00f8e8447443b76160a1446"
+        ]
+    },
+    {
+        "queryCommit": "8593ce85a8bfe80eead55ed1fa46c112ebb5d128",
+        "recommendedCommit": [
+            "1f1285363bc9d96fecab808ca86dfc8dbd2c5889",
+            "b2daa53d157ca395c5da600fe99bbda859f15c89",
+            "fc41c4d5fac37675db1e040048d33fb4812dea4d",
+            "bd7b036d0bbdfb7dd3b8f3774a5ad2346a767e0c",
+            "dc584b557b556ab74ba99654858759fadb7a301c",
+            "ff169c5e67162c3da99d47cee3b491cc3e1f8f52",
+            "975a811da119743e363cf2df6c817df89469de58",
+            "ef01d1dbf97ed2badfa467d44c1ade68ca9c6f8a",
+            "ded3c58375c9560b6bfcc499ecfe2817135133aa",
+            "53f4bfc9c3cc50675c4022255fa9eada0aad717d"
+        ]
+    },
+    {
+        "queryCommit": "a293ddf757613a06a6558336047e4a4308b0f1b9",
+        "recommendedCommit": [
+            "b0878a845114745d7eb9ed87e25b6f91dc55b70e",
+            "67f4e86acf64edc9d207ecb70ca6b945bf94983b",
+            "7146a306cd73fa591ef273214e5c2feb12f587be",
+            "538ca833d513dbd7943ad22dd6e0eb2cd85dfb07",
+            "34a6a12ce3f78271196a405ecabe565414cfc418",
+            "53323cf5b6252397dbde8aeecfb3af2be20d9f4b",
+            "53bd98e39e4e35e9203bf4d23858c6465a9d3836",
+            "fb478e926dbf163e22f5c84e0da29516ca32aad4",
+            "813c022d75df4a6f551e76fb526376fc3809bc6f",
+            "1991d2268c96e57dccd6c789b1f2516197a3fddf"
+        ]
+    },
+    {
+        "queryCommit": "caeca773eb0a222f6a052f702ed712aa24fb5510",
+        "recommendedCommit": [
+            "e04ea849328e92defa135fdc7bc7484a29c447e8",
+            "8c95f3fe631a853df87408e0f2ddf5cec469a35d",
+            "065cb0398fbcb5ca3e83f9ed614756ab81de13f3",
+            "fa322ba5b4a063df41ff1614e8073afc795abf9c",
+            "929e12839917135fb238fc602193d3e98d713ca9",
+            "dbbdf1cea731cfc5c558fa84e2d32a6a49c8f6ad",
+            "25da62c109146a0dc76a0cb37595910b2f7be856",
+            "8957fa2637a0b5a2ddd0aebbc53f261bcce79528",
+            "ddfef631e242f303c52b6990ee607e0b262bbe14",
+            "ffe2781ab894f61586af95787a0f98ddb8866bb0"
+        ]
+    },
+    {
+        "queryCommit": "197068dd87cd0b167c2f953560a94d320398a038",
+        "recommendedCommit": [
+            "ce18df421767f9dfb93ba6c900c66ff4d3c47493",
+            "b0e7e8a7db4f5ac7329caa67b3b3cd5ee02f6ce5",
+            "e41e8cac4df19285737a2fdd7db1622008af1470",
+            "3ef0cef800a105a88e72949adf653bb75b8963c5",
+            "9a581015c456b60ee4890491b1f608a2cb24fb8c",
+            "dd1df04b166fe02498a410e30fbe6f2deca816a9",
+            "719371ef5bfd0030e1daacfc7cfc1d151f1e3f1a",
+            "d41abaa36d96eadcf3144ddd7340c70005fc8c87",
+            "029610bd1f050feb5110772c45dc4aea951d9fe0",
+            "e09b95be0ec2abb87bd6459c0b8376185a545a7e"
+        ]
+    },
+    {
+        "queryCommit": "2869c58bf530b4e9ff1efafed69ff788d7cbcec8",
+        "recommendedCommit": [
+            "64fc475972c3104d4a2e5bbe1ca2f14bef2c810c",
+            "1d37ebc4a54769578a04306e4eb144e1b201a8ca",
+            "6970474b136ddc201c121956c8662506dfbc2f0f",
+            "c706fcaea487a21da926f11375a01270cfe5a130",
+            "527ca2ce855d51f3d1def846acbaf78ac1e9ea2c",
+            "5aa2fc7c05dcbf67cebe6772c07c9f41ee316f5a",
+            "32ca9c7ede05587dca46173c994bb7fd56fe2732",
+            "a5c6d5f8b2cae6b8675c8c3d40b593bc85014719",
+            "409292d03ec018a70d278580e5e7b67bddaa9faa",
+            "3cdd706bfa8166b93075c8e41a9b9825c7443a6f"
+        ]
+    },
+    {
+        "queryCommit": "130377f5c7620974a5b8d4ba7b3e4c28ed2e0f03",
+        "recommendedCommit": [
+            "f1893e7dc451a65a7c3a15c4607b5e6ea3f016a3",
+            "c799cd74d1164f5cf330896592945013a2e54ec4",
+            "9147174947eac01edada05564dd6cb77e7226fad",
+            "6c8f9c4ee0e0d713d94e8709757bf9536ffb552e",
+            "99d12ea576a0b7a7e43401ae98af8738d215c130",
+            "9ff9143c398f21af33d5e7b48ed995c082bacb98",
+            "a1f862629c223b675a31c4ba9fb7e07c27279090",
+            "fbb1508dae432c2ef16c8e9a23342d631e2b8487",
+            "2342406bda57943d4c3deef951c90c2ae776191b",
+            "021af63c6c6f6ab34281b7781c38c2303a024575"
+        ]
+    },
+    {
+        "queryCommit": "2c087d9215c0ee41c018591bfbcc2c08bd3ac852",
+        "recommendedCommit": [
+            "41e8553a6352fc3bdcabdf3032cc9028c5cd6ad4",
+            "1c68ba2ecb3bf048403cf8fe96e7e269a3d474d7",
+            "99f5a4a519c1bbba017ac170cea4f797f1af3bbd",
+            "c0e30badafed45ada926ee67f412033d34858a48",
+            "5022b17f3b45b701b134f9cf64bfbfcc07c613c8",
+            "d033a811c081d78e1f85a6497deace85b6c4f96a",
+            "be9e213d79a992581a3e604f8546df3048db9d77",
+            "dc635f936ea6050d3327659a047e30fa386da853",
+            "1951bd20d28fd1aa43045158ea4317f7a489a483",
+            "05662d51786d91e6e89133f07c1b5a62bc51d2f0"
+        ]
+    }
+]
