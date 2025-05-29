@@ -73,18 +73,16 @@ def save_triplets(triplets: List[Tuple[str, str, str]], output_file: str):
 def main():
     parser = argparse.ArgumentParser(description="Create triplets from JSON data files.")
     parser.add_argument('--input-patterns', nargs='+', default=['data/bic_bfc_pairs/*/sid.json',
-                                                            'data/bic_bfc_pairs/*/mid.json',
                                                             'data/bic_bfc_pairs/*/mid_single.json'],
                         help="Patterns to match input JSON files.")
     parser.add_argument('--output-file', help="Output file for saving triplets.")
     args = parser.parse_args()  
 
     output_file_path = args.output_file
+    input_patterns = args.input_patterns
 
     # Load the data from multiple files
-    data = load_data_from_patterns(['data/bic_bfc_pairs/*/sid.json',
-                                    'data/bic_bfc_pairs/*/mid.json',
-                                    'data/bic_bfc_pairs/*/mid_single.json'])
+    data = load_data_from_patterns(input_patterns)
     
     # Create triplets
     triplets = create_triplets(data)
