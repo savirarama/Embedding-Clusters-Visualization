@@ -6,6 +6,7 @@ import json
 from sklearn.metrics import precision_recall_fscore_support
 from collections import defaultdict
 import argparse
+from get_modified_files import get_modified_files_from_commit
 
 def load_data(json_file_path, npy_file_path):
     """
@@ -193,6 +194,8 @@ if __name__ == "__main__":
                       help='Path to save ranking results')
     parser.add_argument('--num-similar', type=int, default=10,
                       help='Number of top similar commits to retrieve')
+    parser.add_argument('--repo-name', type=str, help='Name of the repository')
+    parser.add_argument('--user', type=str, help='Name of the user')
 
     args = parser.parse_args()
 
@@ -234,10 +237,29 @@ if __name__ == "__main__":
                 commit_hashes=all_commit_hashes,
                 all_embeddings=all_commit_embeddings
             )
+            query_modified_files = get_modified_files_from_commit(query_hash,
+                                                                  repo_path='.',
+                                                                  remote_url=f"https://github.com/{args.user}/{args.repo_name}.git",
+                                                                  )
+            target_modified_files = []
+            for entry in similar_commits_with_scores:
+               entry_modified_files = get_modified_files_from_commit(entry['hash'],
+                                                                  repo_path='.',
+                                                                  remote_url=f"https://github.com/{args.user}/{args.repo_name}.git",
+                                                                  )
+               if entry_modified_files:  # Only append if we got valid files
+                   target_modified_files.extend(entry_modified_files)
+            
+
+            target_modified_files = list(set(target_modified_files))
+            query_modified_files = query_modified_files or []  # Handle None case
+            recommended_files = list(set(target_modified_files) - set(query_modified_files))
 
             recommendation_results.append({
                 "queryCommit": query_hash,
-                "recommendedCommitSimilarityPairs": similar_commits_with_scores
+                "queryModifiedFiles": query_modified_files,
+                "recommendedCommitSimilarityPairs": similar_commits_with_scores,
+                "recommendedFiles": recommended_files
             })
 
             # --- Accuracy Calculation (run once per query) ---
