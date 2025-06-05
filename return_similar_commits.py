@@ -86,9 +86,7 @@ def find_similar_commits(commit_input_hash, n, commit_hashes, all_embeddings, ta
 
     Returns:
         tuple: A tuple containing:
-            - list: A list of the top N most similar commit hashes, where N refers
-                    to the number of distinct similarity ranks to include. All commits
-                    within the Nth rank (if tied) are included. Returns an empty list on error.
+            - list: A list of dictionaries containing commit hashes and their similarity scores
             - int or None: The rank of target_commit_to_rank if found (based on distinct ranks), otherwise None.
             - float or None: The similarity score of target_commit_to_rank if found, otherwise None.
     """
@@ -129,7 +127,7 @@ def find_similar_commits(commit_input_hash, n, commit_hashes, all_embeddings, ta
         
         # Get the commit hash using its positional index from the commit_hashes list
         commit_hash = commit_hashes[i]
-        commit_similarity_pairs.append({'hash': commit_hash, 'similarity': score})
+        commit_similarity_pairs.append({'hash': commit_hash, 'similarity': float(score)})
 
     # 4. Sort by similarity in descending order
     # Python's sort is stable, meaning that if two items have the same similarity score,
@@ -140,28 +138,28 @@ def find_similar_commits(commit_input_hash, n, commit_hashes, all_embeddings, ta
     grouped_commit_similarity_pairs = []
     if commit_similarity_pairs: # Only process if there are pairs
         current_similarity = None
-        current_group_hashes = []
+        current_group = []
         
         for pair in commit_similarity_pairs:
             if current_similarity is None or pair['similarity'] == current_similarity:
                 # If first element or same similarity, add to current group
                 current_similarity = pair['similarity']
-                current_group_hashes.append(pair['hash'])
+                current_group.append(pair)
             else:
                 # If new similarity, save previous group and start a new one
-                grouped_commit_similarity_pairs.append({'similarity': current_similarity, 'hashes': current_group_hashes})
+                grouped_commit_similarity_pairs.append(current_group)
                 current_similarity = pair['similarity']
-                current_group_hashes = [pair['hash']]
+                current_group = [pair]
         
         # Add the last group after the loop finishes
-        grouped_commit_similarity_pairs.append({'similarity': current_similarity, 'hashes': current_group_hashes})
+        grouped_commit_similarity_pairs.append(current_group)
 
     # 5. Return top N commit hashes based on distinct ranks
     top_n_commits = []
     ranks_processed = 0
     for group in grouped_commit_similarity_pairs:
         ranks_processed += 1
-        top_n_commits.extend(group['hashes'])
+        top_n_commits.extend(group)
         # Stop once we have accumulated 'n' distinct ranks
         if ranks_processed >= n:
             break
@@ -172,9 +170,9 @@ def find_similar_commits(commit_input_hash, n, commit_hashes, all_embeddings, ta
     if target_commit_to_rank is not None:
         # Iterate through the grouped pairs to find the rank of the specified target commit
         for rank, group in enumerate(grouped_commit_similarity_pairs, start=1):
-            if target_commit_to_rank in group['hashes']:
+            if any(pair['hash'] == target_commit_to_rank for pair in group):
                 target_rank = rank
-                target_similarity_score = group['similarity']
+                target_similarity_score = next(pair['similarity'] for pair in group if pair['hash'] == target_commit_to_rank)
                 break
     
     return top_n_commits, target_rank, target_similarity_score
@@ -212,7 +210,6 @@ if __name__ == "__main__":
     print(f"Loading query commits from '{query_json_path}'...")
     query_entries = load_query_commits(query_json_path)
 
-
     if all_commit_hashes is not None and all_commit_embeddings is not None and query_entries:
         # Initialize results
         rank_results = []
@@ -231,7 +228,7 @@ if __name__ == "__main__":
             print(f"\nProcessing query commit: {query_hash}")
             
             # --- Top-N similar commits for recommendation output ---
-            similar_commits, _, _ = find_similar_commits(
+            similar_commits_with_scores, _, _ = find_similar_commits(
                 commit_input_hash=query_hash,
                 n=num_similar_commits,
                 commit_hashes=all_commit_hashes,
@@ -240,11 +237,12 @@ if __name__ == "__main__":
 
             recommendation_results.append({
                 "queryCommit": query_hash,
-                "recommendedCommit": similar_commits
+                "recommendedCommitSimilarityPairs": similar_commits_with_scores
             })
 
             # --- Accuracy Calculation (run once per query) ---
-            if any(target_hash in similar_commits for target_hash in target_hashes):
+            similar_commit_hashes = [pair['hash'] for pair in similar_commits_with_scores]
+            if any(target_hash in similar_commit_hashes for target_hash in target_hashes):
                 all_correct_predictions += 1
 
             # --- Target commit ranking output ---
@@ -265,20 +263,18 @@ if __name__ == "__main__":
                 })
 
                 # Binary ground truth: which top-N recommendations are actually relevant
-                true_labels = [1 if commit in target_hashes else 0 for commit in similar_commits]
-                pred_labels = [1] * len(similar_commits)  # predicted all as relevant (top-N)
+                true_labels = [1 if pair['hash'] in target_hashes else 0 for pair in similar_commits_with_scores]
+                pred_labels = [1] * len(similar_commits_with_scores)  # predicted all as relevant (top-N)
 
                 all_true_labels.extend(true_labels)
                 all_pred_labels.extend(pred_labels)
 
                 print(f"→ Target commit '{target_hash}' ranked #{rank} for query '{query_hash}'.")
 
-
         precision, recall, f1, _ = precision_recall_fscore_support(
             all_true_labels, all_pred_labels, average='micro'
         )
         accuracy = all_correct_predictions / total_queries
-
 
         # Print metrics
         print("\nMetrics for all queries:")
