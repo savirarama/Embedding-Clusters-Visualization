@@ -1,0 +1,302 @@
+[
+    {
+        "queryCommit": "995080c44c2bf296eb58764cab6f536ce5a808a1",
+        "recommendedCommitSimilarityPairs": [
+            {
+                "hash": "3a36aa45a5e108cef2014e34ff148e917ada8cfd",
+                "similarity": 0.9661192297935486
+            },
+            {
+                "hash": "6ad16a9c50f48a98def23e5720218659a410dd08",
+                "similarity": 0.9617626667022705
+            },
+            {
+                "hash": "e4b27cedf400b4dc720134fdccd9ce98b20b06c6",
+                "similarity": 0.9573174715042114
+            },
+            {
+                "hash": "a12f1b1853fdf0d8a263ec00d4f0752edaaed4f0",
+                "similarity": 0.9561116695404053
+            },
+            {
+                "hash": "8cc970c95046f2d2f7026b8637eeaf88ddce9c0a",
+                "similarity": 0.9549232125282288
+            }
+        ]
+    },
+    {
+        "queryCommit": "f42ead0d39e34578c6fe9636af4cfbd9d91e47a5",
+        "recommendedCommitSimilarityPairs": [
+            {
+                "hash": "10cbb3d541926be946ac644a694373ac1690b338",
+                "similarity": 0.900797963142395
+            },
+            {
+                "hash": "41efe1a7e07d3abae1d82bc6d8340e78210cadc0",
+                "similarity": 0.8951634764671326
+            },
+            {
+                "hash": "65782b505478a37d01468064c6bcd5eb5cd75f88",
+                "similarity": 0.8950571417808533
+            },
+            {
+                "hash": "d372a4fe6c9abe3c7985ed270bd44e7112399bad",
+                "similarity": 0.8889181017875671
+            },
+            {
+                "hash": "9aa4b70e260dd82d5da9bdb5381ff9d32bf0ed89",
+                "similarity": 0.8777329921722412
+            }
+        ]
+    },
+    {
+        "queryCommit": "01d3af40b475708b252186c5a659a2128e887442",
+        "recommendedCommitSimilarityPairs": [
+            {
+                "hash": "c617032b868ce06177b30367c34918916289be3d",
+                "similarity": 0.9991512298583984
+            },
+            {
+                "hash": "f5b1c0330053647898e590845f75a7d5c010735e",
+                "similarity": 0.9990730285644531
+            },
+            {
+                "hash": "43f787d68012badd4c980be2d36195a8ce56bf40",
+                "similarity": 0.9990190863609314
+            },
+            {
+                "hash": "7da561704681c15170bd23714df543a2522f532f",
+                "similarity": 0.9988059401512146
+            },
+            {
+                "hash": "8d922497b8097a570ea9376c84e30f7bb1b7456a",
+                "similarity": 0.9987298250198364
+            }
+        ]
+    },
+    {
+        "queryCommit": "659a33e8e094f68e46c824374d25da67b4c30421",
+        "recommendedCommitSimilarityPairs": [
+            {
+                "hash": "0aa865cf4e9a72db0526a3476a59b5231fd94556",
+                "similarity": 0.9953471422195435
+            },
+            {
+                "hash": "ff452a4869154ff50acec6dfb70190c26c0676ca",
+                "similarity": 0.993793785572052
+            },
+            {
+                "hash": "df1061b79cd3be716567e3ecbc595126036d517f",
+                "similarity": 0.9932279586791992
+            },
+            {
+                "hash": "82b38635550d2df9b56453d90dd8a1aad99db7a3",
+                "similarity": 0.9930039644241333
+            },
+            {
+                "hash": "e0426c51cd6991741e9be321aaa1e4f5361e0e3e",
+                "similarity": 0.9921967387199402
+            }
+        ]
+    },
+    {
+        "queryCommit": "ca083a5b864b57650073204344bd5461d2a3d78e",
+        "recommendedCommitSimilarityPairs": [
+            {
+                "hash": "738cd5159b7d2deed967537a401586e0bd5cad74",
+                "similarity": 0.9819119572639465
+            },
+            {
+                "hash": "5b02f13f7e892e39cad741e3a4515dc70b150e9e",
+                "similarity": 0.9816899299621582
+            },
+            {
+                "hash": "443cba7a7a3838b547880f1c49f2a9e0128692cd",
+                "similarity": 0.9771559238433838
+            },
+            {
+                "hash": "44594962e9f14f98507a540d7be650425ca2beac",
+                "similarity": 0.9765602350234985
+            },
+            {
+                "hash": "17796e40b33ddc8f9444e9cd5a9ba3224ca12fca",
+                "similarity": 0.9758807420730591
+            }
+        ]
+    },
+    {
+        "queryCommit": "db2dda1b7b6431a2ee57148db2de74c0432b9480",
+        "recommendedCommitSimilarityPairs": [
+            {
+                "hash": "5bcb51712d350ad5814d4a67bd93429ee820b8b7",
+                "similarity": 0.9903769493103027
+            },
+            {
+                "hash": "01506c6dd313a6bca42411f12f92839da29ac1d1",
+                "similarity": 0.989812970161438
+            },
+            {
+                "hash": "2ea2cd5661194524f1c01465520409a506224a29",
+                "similarity": 0.9891114234924316
+            },
+            {
+                "hash": "265b14e3f56874745233b736e785d8e24dc212f2",
+                "similarity": 0.9890838265419006
+            },
+            {
+                "hash": "f08c58c597a4c203b8f9759b540fd0736b3c6ae1",
+                "similarity": 0.9888019561767578
+            }
+        ]
+    },
+    {
+        "queryCommit": "2c983317179634d6ddc10726defff303be4ae708",
+        "recommendedCommitSimilarityPairs": [
+            {
+                "hash": "956a50ecb358ab2df3a705c05f3fa8c4ae8846a8",
+                "similarity": 0.9993991851806641
+            },
+            {
+                "hash": "c9c3fdd4f5fc648ccc5e3a905236a82e88524251",
+                "similarity": 0.9993930459022522
+            },
+            {
+                "hash": "f5b1c0330053647898e590845f75a7d5c010735e",
+                "similarity": 0.9993714094161987
+            },
+            {
+                "hash": "c617032b868ce06177b30367c34918916289be3d",
+                "similarity": 0.9992879033088684
+            },
+            {
+                "hash": "f70f507034aeadea54db86ff3dab74cbe2d271eb",
+                "similarity": 0.9992563128471375
+            }
+        ]
+    },
+    {
+        "queryCommit": "dad7c7c93a7825dd967d42a99380ccd8beb06e24",
+        "recommendedCommitSimilarityPairs": [
+            {
+                "hash": "39b22d3eb5fb478376ebbf80a7d388baf5fd0338",
+                "similarity": 0.9937689304351807
+            },
+            {
+                "hash": "e9aafc23c32324e527c7eb9364de6132f563ece3",
+                "similarity": 0.9928436279296875
+            },
+            {
+                "hash": "ac451b382ad38003788e37496c003dcf9574f03a",
+                "similarity": 0.992659866809845
+            },
+            {
+                "hash": "774c2c7cf3f0652215d2ce598baaa5f3fc9890a6",
+                "similarity": 0.9924180507659912
+            },
+            {
+                "hash": "660634b70528861276d918502f21f622dc90103d",
+                "similarity": 0.9923380613327026
+            }
+        ]
+    },
+    {
+        "queryCommit": "3af75fc685d6e2a90a9f68c204122a87ac90e781",
+        "recommendedCommitSimilarityPairs": [
+            {
+                "hash": "4d10c92f842472a92ace86e838851cc6915231e6",
+                "similarity": 0.9624125957489014
+            },
+            {
+                "hash": "97a309dd224e8478b881cd4e0cb0d47da3ebdb59",
+                "similarity": 0.9610162377357483
+            },
+            {
+                "hash": "be3a5789421f1f5588c00f0ed7320323ebfa197f",
+                "similarity": 0.9594752192497253
+            },
+            {
+                "hash": "2fe0bef866752716de2b85350eed1962e5fd4ba7",
+                "similarity": 0.9568041563034058
+            },
+            {
+                "hash": "0a3de476285e7d8b9f679448d73161ed509dc42d",
+                "similarity": 0.9557974338531494
+            }
+        ]
+    },
+    {
+        "queryCommit": "22a6209b8bf579eeadf337c58d4f45fbfb87c8e4",
+        "recommendedCommitSimilarityPairs": [
+            {
+                "hash": "8e0f19a1c9b99cd30368a2cee64d898f896c9cbf",
+                "similarity": 0.9948230981826782
+            },
+            {
+                "hash": "86a2cbb79ec8bdd0bee0b861828eb27d2970e871",
+                "similarity": 0.994591236114502
+            },
+            {
+                "hash": "add22171568d9bfe25e0db46105bc052d5991c37",
+                "similarity": 0.9942615032196045
+            },
+            {
+                "hash": "4ce9ab25d061a7cb1f79b49746637b91c22c40ec",
+                "similarity": 0.9939202666282654
+            },
+            {
+                "hash": "0657a3aaa054d001fcafceea98a9c22d06145cb0",
+                "similarity": 0.9937500953674316
+            }
+        ]
+    },
+    {
+        "queryCommit": "d1aaecba9127428cbde324aec20c7d58c24953c2",
+        "recommendedCommitSimilarityPairs": [
+            {
+                "hash": "4be3d662550f3c5ecf6b1a501d2a9beafa5b2d9a",
+                "similarity": 0.960097074508667
+            },
+            {
+                "hash": "14379abcb6acb9794924bb9767eabc5b84caefad",
+                "similarity": 0.9542243480682373
+            },
+            {
+                "hash": "abd135a3c58e9669c5e80b76a8579f4500c2c9ee",
+                "similarity": 0.9538434743881226
+            },
+            {
+                "hash": "c70a4b380248945c028b90daaf58cbf7e4070e7a",
+                "similarity": 0.9524015188217163
+            },
+            {
+                "hash": "f868c3762cf39628e32bda051f98862a56628220",
+                "similarity": 0.9467520713806152
+            }
+        ]
+    },
+    {
+        "queryCommit": "2f788f4826d0fd6d96ad04def79320e8479c9108",
+        "recommendedCommitSimilarityPairs": [
+            {
+                "hash": "57e8f21957b229c362a18b25809325e184a09cf2",
+                "similarity": 0.9988725781440735
+            },
+            {
+                "hash": "7ef140ec40c3768859b848350db8c6d6d20f7a56",
+                "similarity": 0.9986855983734131
+            },
+            {
+                "hash": "951ee9fea7f4530e159c416f1e22255864f7854c",
+                "similarity": 0.9986535906791687
+            },
+            {
+                "hash": "79e127f2b1dd7352bdc7b30ceef74391d4930a9f",
+                "similarity": 0.9985933303833008
+            },
+            {
+                "hash": "39bc7a0524862a3d39a818e9ac7748874dc06949",
+                "similarity": 0.9984573125839233
+            }
+        ]
+    }
+]
