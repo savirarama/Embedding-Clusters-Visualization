@@ -7,46 +7,43 @@ from sklearn.metrics import precision_recall_fscore_support
 from collections import defaultdict
 import argparse
 
-def load_data(csv_file_path, npy_file_path):
+def load_data(json_file_path, npy_file_path):
     """
-    Loads commit data from a CSV file and embeddings from a .npy file.
+    Loads commit data from a JSON file and embeddings from a .npy file.
 
     Args:
-        csv_file_path (str): Path to the CSV file containing commit information.
-                               It must have a column named 'commit' for commit hashes.
+        json_file_path (str): Path to the JSON file containing commit hashes.
         npy_file_path (str): Path to the .npy file containing commit embeddings.
-                             The order of embeddings must match the order of commits in the CSV.
+                             The order of embeddings must match the order of commits in the JSON.
 
     Returns:
-        tuple: A pandas DataFrame with commit information and a NumPy array with embeddings.
+        tuple: A list of commit hashes and a NumPy array with embeddings.
                Returns (None, None) if loading fails or files don't exist.
     """
     # Check if files exist
-    if not os.path.exists(csv_file_path):
-        print(f"Error: CSV file not found at {csv_file_path}")
+    if not os.path.exists(json_file_path):
+        print(f"Error: JSON file not found at {json_file_path}")
         return None, None
     if not os.path.exists(npy_file_path):
         print(f"Error: NPY file not found at {npy_file_path}")
         return None, None
 
     try:
-        # Load commit information
-        df_commits = pd.read_csv(csv_file_path)
-        if 'commit' not in df_commits.columns:
-            print("Error: CSV file must have a 'commit' column for commit hashes.")
-            return None, None
+        # Load commit hashes from JSON
+        with open(json_file_path, 'r') as f:
+            commit_hashes = json.load(f)
 
         # Load commit embeddings
         embeddings = np.load(npy_file_path)
 
         # Validate that the number of commits matches the number of embeddings
-        if len(df_commits) != len(embeddings):
-            print(f"Error: Number of commits in CSV ({len(df_commits)}) "
+        if len(commit_hashes) != len(embeddings):
+            print(f"Error: Number of commits in JSON ({len(commit_hashes)}) "
                   f"does not match number of embeddings in NPY file ({len(embeddings)}).")
-            print("Please ensure the .npy file contains embeddings in the same order as the CSV.")
+            print("Please ensure the .npy file contains embeddings in the same order as the JSON.")
             return None, None
             
-        return df_commits, embeddings
+        return commit_hashes, embeddings
     except Exception as e:
         print(f"An error occurred while loading data: {e}")
         return None, None
@@ -73,103 +70,111 @@ def load_query_commits(json_path):
         print(f"An error occurred while reading the JSON file: {e}")
         return []
 
-def find_similar_commits(commit_input_hash, n, df_commits, all_embeddings, target_commit_to_rank=None):
+def find_similar_commits(commit_input_hash, n, commit_hashes, all_embeddings, target_commit_to_rank=None):
     """
-    Finds the n most similar commits to a given commit hash.
+    Finds the n most similar commits to a given commit hash, grouping commits
+    with identical similarity scores.
 
     Args:
         commit_input_hash (str): The hash of the input commit.
-        n (int): The number of similar commits to find.
-        df_commits (pd.DataFrame): DataFrame containing commit information with a 'commit' column.
+        n (int): The number of top distinct similarity ranks to consider.
+                 If n=1, it returns all commits with the highest similarity.
+                 If n=2, it returns all commits from the top two distinct similarity ranks.
+        commit_hashes (list): A list of all commit hashes, corresponding to the order of embeddings.
         all_embeddings (np.ndarray): NumPy array of all commit embeddings.
+        target_commit_to_rank (str, optional): An optional commit hash to find its rank in the grouped list.
 
     Returns:
-        list: A list of the n most similar commit hashes. Returns an empty list on error.
+        tuple: A tuple containing:
+            - list: A list of the top N most similar commit hashes, where N refers
+                    to the number of distinct similarity ranks to include. All commits
+                    within the Nth rank (if tied) are included. Returns an empty list on error.
+            - int or None: The rank of target_commit_to_rank if found (based on distinct ranks), otherwise None.
+            - float or None: The similarity score of target_commit_to_rank if found, otherwise None.
     """
     # 1. Find the index and embedding of the input commit
     try:
-        # Get the row corresponding to the commit_input_hash
-        target_commit_series = df_commits[df_commits['commit'] == commit_input_hash]
-        
-        if target_commit_series.empty:
-            print(f"Error: Commit hash '{commit_input_hash}' not found in the CSV file.")
-            return []
-        
-        # Get the index (iloc) of this commit in the DataFrame.
-        # This index corresponds to the row number in all_embeddings.
-        # Assuming default integer index for df_commits after read_csv.
-        # If df_commits has a non-standard index, this might need adjustment,
-        # but .index[0] gets the label, and we need its positional equivalent.
-        # A safer way if index is not guaranteed to be 0-based sequential:
-        target_idx = target_commit_series.index.values[0] 
-        # Find the positional index if the DataFrame index is not simple 0..N-1
-        try:
-            # Try to get positional index directly if index is simple
-            positional_target_idx = df_commits.index.get_loc(target_idx)
-        except TypeError:
-            # If index is not unique or other issues, fall back to iterating
-            # This is less efficient but robust if index is complex
-            positional_target_idx = -1
-            for i, r_idx in enumerate(df_commits.index):
-                if r_idx == target_idx:
-                    positional_target_idx = i
-                    break
-            if positional_target_idx == -1: # Should not happen if target_commit_series was found
-                 print(f"Error: Could not determine positional index for commit '{commit_input_hash}'.")
-                 return []
+        # Check if the input commit hash exists in the provided list
+        if commit_input_hash not in commit_hashes:
+            print(f"Error: Commit hash '{commit_input_hash}' not found in list of commit hashes.")
+            return [], None, None # Return empty list and None for ranks on error
 
-
+        # Get the positional index of the input commit hash
+        positional_target_idx = commit_hashes.index(commit_input_hash)
+        
+        # Retrieve the embedding for the target commit using its index
         target_embedding = all_embeddings[positional_target_idx]
 
-    except KeyError: # This would be caught by the 'Commit' column check in load_data
-        print("Error: 'commit' column not found in the CSV file.")
-        return []
-    except IndexError: # If target_commit_series.index.values[0] fails
-        print(f"Error: Could not retrieve index for commit hash '{commit_input_hash}'.")
-        return []
     except Exception as e:
+        # Catch any exceptions during the retrieval of the input commit's embedding
         print(f"An error occurred while finding the input commit embedding: {e}")
-        return []
+        return [], None, None # Return empty list and None for ranks on error
 
     # 2. Calculate cosine similarity
-    # Reshape target_embedding to be a 2D array (1, num_features) for cosine_similarity function
+    # Reshape target_embedding to be a 2D array (1, num_features) as required by cosine_similarity
     target_embedding_reshaped = target_embedding.reshape(1, -1)
     
-    # Calculate similarities between the target and all embeddings
-    # cosine_similarity returns a 2D array, e.g., [[sim_to_emb0, sim_to_emb1, ...]]
+    # Calculate similarities between the target embedding and all other embeddings
+    # cosine_similarity returns a 2D array, which we then flatten to a 1D array of scores
     similarity_matrix = cosine_similarity(target_embedding_reshaped, all_embeddings)
-    
-    # Extract the 1D array of similarity scores
-    similarity_scores = similarity_matrix[0]
+    similarity_scores = similarity_matrix[0] # Extract the 1D array of similarity scores
 
     # 3. Store similarities with commit hashes, excluding the input commit itself
     commit_similarity_pairs = []
     for i, score in enumerate(similarity_scores):
-        # Exclude the input commit itself (which will have similarity ~1.0)
+        # The input commit will have a similarity score very close to 1.0 with itself,
+        # so we exclude it from the list of similar commits.
         if i == positional_target_idx:
             continue
         
-        # Get the commit hash using iloc for positional access
-        commit_hash = df_commits.iloc[i]['commit']
+        # Get the commit hash using its positional index from the commit_hashes list
+        commit_hash = commit_hashes[i]
         commit_similarity_pairs.append({'hash': commit_hash, 'similarity': score})
 
     # 4. Sort by similarity in descending order
-    # Using a lambda function to specify sorting by the 'similarity' value
+    # Python's sort is stable, meaning that if two items have the same similarity score,
+    # their relative order in the original list is preserved.
     commit_similarity_pairs.sort(key=lambda x: x['similarity'], reverse=True)
 
-    # 5. Return top N commit hashes
-    # Ensure we don't try to get more items than available
-    num_results = min(n, len(commit_similarity_pairs))
-    top_n_commits = [pair['hash'] for pair in commit_similarity_pairs[:num_results]]
+    # 4.5 Group commits by identical similarity scores
+    grouped_commit_similarity_pairs = []
+    if commit_similarity_pairs: # Only process if there are pairs
+        current_similarity = None
+        current_group_hashes = []
+        
+        for pair in commit_similarity_pairs:
+            if current_similarity is None or pair['similarity'] == current_similarity:
+                # If first element or same similarity, add to current group
+                current_similarity = pair['similarity']
+                current_group_hashes.append(pair['hash'])
+            else:
+                # If new similarity, save previous group and start a new one
+                grouped_commit_similarity_pairs.append({'similarity': current_similarity, 'hashes': current_group_hashes})
+                current_similarity = pair['similarity']
+                current_group_hashes = [pair['hash']]
+        
+        # Add the last group after the loop finishes
+        grouped_commit_similarity_pairs.append({'similarity': current_similarity, 'hashes': current_group_hashes})
+
+    # 5. Return top N commit hashes based on distinct ranks
+    top_n_commits = []
+    ranks_processed = 0
+    for group in grouped_commit_similarity_pairs:
+        ranks_processed += 1
+        top_n_commits.extend(group['hashes'])
+        # Stop once we have accumulated 'n' distinct ranks
+        if ranks_processed >= n:
+            break
 
     # 6. Find rank of target_commit_to_rank (if specified)
     target_rank = None
     target_similarity_score = None
     if target_commit_to_rank is not None:
-        for rank, pair in enumerate(commit_similarity_pairs, start=1):
-            if pair['hash'] == target_commit_to_rank:
+        # Iterate through the grouped pairs to find the rank of the specified target commit
+        for rank, group in enumerate(grouped_commit_similarity_pairs, start=1):
+            if target_commit_to_rank in group['hashes']:
                 target_rank = rank
-                target_similarity_score = pair['similarity']
+                target_similarity_score = group['similarity']
                 break
     
     return top_n_commits, target_rank, target_similarity_score
@@ -178,8 +183,8 @@ def find_similar_commits(commit_input_hash, n, df_commits, all_embeddings, targe
 if __name__ == "__main__":
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Find similar commits based on embeddings.')
-    parser.add_argument('--csv', type=str,
-                      help='Path to the CSV file containing commit information')
+    parser.add_argument('--hashes', type=str,
+                      help='Path to the JSON file containing commit hashes')
     parser.add_argument('--npy', type=str, default='embedding/compressed_embeddings.npy',
                       help='Path to the NPY file containing commit embeddings')
     parser.add_argument('--query', type=str, default='data/sid.json',
@@ -194,7 +199,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # --- Configuration ---
-    csv_file_path = args.csv
+    hash_file_path = args.hashes
     npy_file_path = args.npy
     query_json_path = args.query
     save_results_path = args.output_recommendations
@@ -202,13 +207,13 @@ if __name__ == "__main__":
     num_similar_commits = args.num_similar
 
     print("Loading commit data...")
-    df_all_commits, all_commit_embeddings = load_data(csv_file_path, npy_file_path)
+    all_commit_hashes, all_commit_embeddings = load_data(hash_file_path, npy_file_path)
 
     print(f"Loading query commits from '{query_json_path}'...")
     query_entries = load_query_commits(query_json_path)
 
 
-    if df_all_commits is not None and all_commit_embeddings is not None and query_entries:
+    if all_commit_hashes is not None and all_commit_embeddings is not None and query_entries:
         # Initialize results
         rank_results = []
         recommendation_results = []
@@ -229,7 +234,7 @@ if __name__ == "__main__":
             similar_commits, _, _ = find_similar_commits(
                 commit_input_hash=query_hash,
                 n=num_similar_commits,
-                df_commits=df_all_commits,
+                commit_hashes=all_commit_hashes,
                 all_embeddings=all_commit_embeddings
             )
 
@@ -247,7 +252,7 @@ if __name__ == "__main__":
                 _, rank, target_similarity_score = find_similar_commits(
                     commit_input_hash=query_hash,
                     n=num_similar_commits,
-                    df_commits=df_all_commits,
+                    commit_hashes=all_commit_hashes,
                     all_embeddings=all_commit_embeddings,
                     target_commit_to_rank=target_hash
                 )
