@@ -1,0 +1,16 @@
+2025-06-09 14:26:25,261 - INFO - Starting commit similarity analysis
+2025-06-09 14:26:25,261 - INFO - Query file: data/bic_bfc_pairs/accumulo/sid.json
+2025-06-09 14:26:25,261 - INFO - Embedding file: data/initial_embedding/embeddings_accumulo.npy
+2025-06-09 14:26:25,261 - INFO - Num of similar commits: 5
+2025-06-09 14:27:02,753 - INFO - 
+Metrics for commit recommendation:
+2025-06-09 14:27:02,753 - INFO - MRR: 0.0003
+2025-06-09 14:27:02,754 - INFO - Accuracy: 0.0000
+2025-06-09 14:27:02,755 - INFO - 
+✔️ Recommendation results written to recommendation_results/accumulo_initial_recommendation_results.json
+2025-06-09 14:27:02,755 - INFO - ✔️ Ranking results written to recommendation_results/accumulo_initial_recommendation_rank_results.json
+2025-06-09 14:27:02,756 - INFO - Performance metrics for file recommendation:
+2025-06-09 14:27:02,756 - INFO - Precision: 0.0020833333333333333
+2025-06-09 14:27:02,756 - INFO - Recall: 0.016666666666666666
+2025-06-09 14:27:02,756 - INFO - F1: 0.0037037037037037043
+2025-06-09 14:27:02,756 - INFO - Performance metrics have been saved to: logs/performance_metrics_20250609_142625.log
