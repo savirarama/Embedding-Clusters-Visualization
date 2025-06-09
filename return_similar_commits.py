@@ -274,7 +274,7 @@ if __name__ == "__main__":
 
     logging.info(f"Query file: {query_json_path}")
     logging.info(f"Embedding file: {npy_file_path}")
-    logging.info(f"Num of simila commits: {num_similar_commits}")
+    logging.info(f"Num of similar commits: {num_similar_commits}")
 
     print("Loading commit data...")
     all_commit_hashes, all_commit_embeddings = load_data(hash_file_path, npy_file_path)
@@ -362,16 +362,18 @@ if __name__ == "__main__":
 
                 print(f"→ Target commit '{target_hash}' ranked #{rank} for query '{query_hash}'.")
 
-        precision, recall, f1, _ = precision_recall_fscore_support(
-            all_true_labels, all_pred_labels, average='micro'
-        )
+        # Calculate MRR
+        reciprocal_ranks = []
+        for entry in rank_results:
+            if entry['rank'] is not None:  # Only consider cases where we found a rank
+                reciprocal_ranks.append(1.0 / entry['rank'])
+        
+        mrr = sum(reciprocal_ranks) / len(reciprocal_ranks) if reciprocal_ranks else 0.0
         accuracy = all_correct_predictions / total_queries
 
-        # Print metrics
-        logging.info("\nMetrics for all queries:")
-        logging.info(f"Precision: {precision:.4f}")
-        logging.info(f"Recall: {recall:.4f}")
-        logging.info(f"F1 Score: {f1:.4f}")
+        # Log metrics
+        logging.info("\nMetrics for commit recommendation:")
+        logging.info(f"MRR: {mrr:.4f}")
         logging.info(f"Accuracy: {accuracy:.4f}")
 
         # Save both outputs
@@ -400,7 +402,7 @@ if __name__ == "__main__":
                 all_recall.append(recall)
                 all_f1_score.append(f1_score)
 
-    logging.info("Performance metrics:")
+    logging.info("Performance metrics for file recommendation:")
     logging.info(f"Precision: {sum(all_precision) / len(all_precision)}")
     logging.info(f"Recall: {sum(all_recall) / len(all_recall)}")
     logging.info(f"F1: {sum(all_f1_score) / len(all_f1_score)}")
