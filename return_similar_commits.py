@@ -7,6 +7,28 @@ from sklearn.metrics import precision_recall_fscore_support
 from collections import defaultdict
 import argparse
 from get_modified_files import get_modified_files_from_commit
+import logging
+from datetime import datetime
+
+# Configure logging
+def setup_logging():
+    # Create logs directory if it doesn't exist
+    os.makedirs('logs', exist_ok=True)
+    
+    # Create a log filename with timestamp
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    log_filename = f'logs/performance_metrics_{timestamp}.log'
+    
+    # Configure logging
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_filename),
+            logging.StreamHandler()  # This will still print to console
+        ]
+    )
+    return log_filename
 
 def load_data(json_file_path, npy_file_path):
     """
@@ -178,8 +200,50 @@ def find_similar_commits(commit_input_hash, n, commit_hashes, all_embeddings, ta
     
     return top_n_commits, target_rank, target_similarity_score
 
+def calculate_performance_metrics(recommended_files, truth_recommended_files):
+    # Convert inputs to sets for efficient intersection operations
+    rec_set = set(recommended_files)
+    truth_set = set(truth_recommended_files)
+
+    # Calculate the number of true positives (overlap)
+    # These are the files that were recommended AND were actually relevant
+    true_positives = len(rec_set.intersection(truth_set))
+
+    # Calculate Precision
+    # Precision = TP / (TP + FP) = TP / Total Recommended
+    if len(rec_set) == 0:
+        # If no files were recommended, precision is 0 (as no correct recommendations were made)
+        precision = 0.0
+    else:
+        precision = true_positives / len(rec_set)
+
+    # Calculate Recall
+    # Recall = TP / (TP + FN) = TP / Total Truth
+    if len(truth_set) == 0:
+        # If there are no true relevant files, recall is 1.0 (as we "found" all 0 relevant items)
+        # However, for practical evaluation, it's often more informative to treat this as undefined
+        # or handle externally. For this function, we'll return 0.0 as it makes sense with F1 later.
+        recall = 0.0
+    else:
+        recall = true_positives / len(truth_set)
+
+    # Calculate F1-score
+    # F1 = 2 * (Precision * Recall) / (Precision + Recall)
+    if (precision + recall) == 0:
+        # Avoid division by zero if both precision and recall are 0
+        f1_score = 0.0
+    else:
+        f1_score = 2 * (precision * recall) / (precision + recall)
+
+    return precision, recall, f1_score
+     
+
 # --- Main execution ---
 if __name__ == "__main__":
+    # Set up logging first
+    log_file = setup_logging()
+    logging.info("Starting commit similarity analysis")
+    
     # Set up argument parser
     parser = argparse.ArgumentParser(description='Find similar commits based on embeddings.')
     parser.add_argument('--hashes', type=str,
@@ -196,6 +260,7 @@ if __name__ == "__main__":
                       help='Number of top similar commits to retrieve')
     parser.add_argument('--repo-name', type=str, help='Name of the repository')
     parser.add_argument('--user', type=str, help='Name of the user')
+    parser.add_argument('--ground-truth', type=str, help='Path to the ground truth file')
 
     args = parser.parse_args()
 
@@ -206,6 +271,10 @@ if __name__ == "__main__":
     save_results_path = args.output_recommendations
     save_ranks_path = args.output_ranks
     num_similar_commits = args.num_similar
+
+    logging.info(f"Query file: {query_json_path}")
+    logging.info(f"Embedding file: {npy_file_path}")
+    logging.info(f"Num of simila commits: {num_similar_commits}")
 
     print("Loading commit data...")
     all_commit_hashes, all_commit_embeddings = load_data(hash_file_path, npy_file_path)
@@ -299,19 +368,40 @@ if __name__ == "__main__":
         accuracy = all_correct_predictions / total_queries
 
         # Print metrics
-        print("\nMetrics for all queries:")
-        print(f"Precision: {precision:.4f}")
-        print(f"Recall: {recall:.4f}")
-        print(f"F1 Score: {f1:.4f}")
-        print(f"Accuracy: {accuracy:.4f}")
+        logging.info("\nMetrics for all queries:")
+        logging.info(f"Precision: {precision:.4f}")
+        logging.info(f"Recall: {recall:.4f}")
+        logging.info(f"F1 Score: {f1:.4f}")
+        logging.info(f"Accuracy: {accuracy:.4f}")
 
         # Save both outputs
         os.makedirs("recommendation_results", exist_ok=True)
 
         with open(save_results_path, "w") as f:
             json.dump(recommendation_results, f, indent=4)
-            print(f"\n✔️ Recommendation results written to {save_results_path}")
+            logging.info(f"\n✔️ Recommendation results written to {save_results_path}")
 
         with open(save_ranks_path, "w") as f:
             json.dump(rank_results, f, indent=4)
-            print(f"✔️ Ranking results written to {save_ranks_path}")
+            logging.info(f"✔️ Ranking results written to {save_ranks_path}")
+
+    with open(args.ground_truth, 'r') as f:
+        ground_truth = json.load(f)
+    
+    all_precision, all_recall, all_f1_score = [], [], []
+    for entry in recommendation_results:
+        query_hash = entry['queryCommit']
+        recommended_files = entry['recommendedFiles']
+        for entry1 in ground_truth:
+            if query_hash in entry1['induceCommitHashList']:
+                truth_recommended_files = entry1['recommendedFiles']
+                precision, recall, f1_score = calculate_performance_metrics(recommended_files, truth_recommended_files)
+                all_precision.append(precision)
+                all_recall.append(recall)
+                all_f1_score.append(f1_score)
+
+    logging.info("Performance metrics:")
+    logging.info(f"Precision: {sum(all_precision) / len(all_precision)}")
+    logging.info(f"Recall: {sum(all_recall) / len(all_recall)}")
+    logging.info(f"F1: {sum(all_f1_score) / len(all_f1_score)}")
+    logging.info(f"Performance metrics have been saved to: {log_file}")
