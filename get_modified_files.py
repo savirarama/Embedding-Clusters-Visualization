@@ -11,7 +11,7 @@ def get_modified_files_from_commit(commit_hash: str, repo_path: str = '.', remot
 
         # 1. Add and fetch from remote if URL is provided
         if remote_url:
-            print(f"Attempting to manage remote '{remote_name}' with URL: {remote_url}...")
+            #print(f"Attempting to manage remote '{remote_name}' with URL: {remote_url}...")
             try:
                 # Check if remote already exists and has the correct URL
                 result_check_remote = subprocess.run(
@@ -21,9 +21,10 @@ def get_modified_files_from_commit(commit_hash: str, repo_path: str = '.', remot
                 existing_url = result_check_remote.stdout.strip()
 
                 if result_check_remote.returncode == 0 and existing_url == remote_url:
-                    print(f"Remote '{remote_name}' already exists with the correct URL.")
+                    #print(f"Remote '{remote_name}' already exists with the correct URL.")
+                    pass
                 elif result_check_remote.returncode == 0 and existing_url != remote_url:
-                    print(f"Remote '{remote_name}' exists with a different URL ({existing_url}). Updating to {remote_url}.")
+                    #print(f"Remote '{remote_name}' exists with a different URL ({existing_url}). Updating to {remote_url}.")
                     subprocess.run(
                         ['git', 'remote', 'set-url', remote_name, remote_url],
                         check=True, capture_output=True, text=True
@@ -40,7 +41,7 @@ def get_modified_files_from_commit(commit_hash: str, repo_path: str = '.', remot
                 print(f"Error managing remote '{remote_name}': {e.stderr.strip()}")
                 return None # Critical error setting up remote
 
-            print(f"Fetching all branches and tags from remote '{remote_name}' to ensure commit objects are present...")
+            #print(f"Fetching all branches and tags from remote '{remote_name}' to ensure commit objects are present...")
             try:
                 # **KEY CHANGE HERE:** Fetch all branches and tags for robustness
                 subprocess.run(
@@ -48,7 +49,7 @@ def get_modified_files_from_commit(commit_hash: str, repo_path: str = '.', remot
                     check=True,
                     capture_output=True, text=True
                 )
-                print(f"Fetched from '{remote_name}' successfully.")
+                #print(f"Fetched from '{remote_name}' successfully.")
             except subprocess.CalledProcessError as e:
                 print(f"Error fetching from remote '{remote_name}': {e.stderr.strip()}")
                 return None
