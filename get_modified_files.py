@@ -7,7 +7,7 @@ def get_modified_files_from_commit(commit_hash: str, repo_path: str = '.', remot
     original_cwd = os.getcwd()
     try:
         os.chdir(repo_path)
-        print(f"Working in Git repository at: {os.getcwd()}")
+        #print(f"Working in Git repository at: {os.getcwd()}")
 
         # 1. Add and fetch from remote if URL is provided
         if remote_url:
@@ -28,7 +28,7 @@ def get_modified_files_from_commit(commit_hash: str, repo_path: str = '.', remot
                         ['git', 'remote', 'set-url', remote_name, remote_url],
                         check=True, capture_output=True, text=True
                     )
-                    print(f"Remote '{remote_name}' URL updated.")
+                    #print(f"Remote '{remote_name}' URL updated.")
                 else: # Remote not found, add it
                     subprocess.run(
                         ['git', 'remote', 'add', remote_name, remote_url],
@@ -54,7 +54,7 @@ def get_modified_files_from_commit(commit_hash: str, repo_path: str = '.', remot
                 return None
 
         # 2. Get the modified files using git show --name-only
-        print(f"Getting file list for commit: {commit_hash}")
+        #print(f"Getting file list for commit: {commit_hash}")
         try:
             # Use --name-only to get just the file paths
             # --pretty=format: suppresses commit message and other header details
