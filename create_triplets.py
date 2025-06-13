@@ -42,7 +42,8 @@ def create_triplets_from_subset(
     all_possible_negatives: Set[str], # All unique commits from the full dataset for global negatives
     commit_hashes: List[str], # New parameter for additional negative candidates
     repo_path: str = '.', # New parameter for get_modified_files_from_commit
-    remote_url: str = None # New parameter for get_modified_files_from_commit
+    remote_url: str = None, # New parameter for get_modified_files_from_commit
+    used_negatives: Set[str] = None # New parameter to track used negatives
 ) -> List[Tuple[str, str, str]]:
     """
     Create triplet pairs (anchor, positive, negative) from a subset of data,
@@ -52,7 +53,12 @@ def create_triplets_from_subset(
     Each negative commit can only be used once across all triplets.
     """
     triplets = []
-    used_negatives = set()  # Track which commits have been used as negatives
+    if used_negatives is None:
+        used_negatives = set()  # Track which commits have been used as negatives
+    
+    # Filter out used negatives from commit_hashes
+    available_negatives = [c for c in commit_hashes if c not in used_negatives]
+    print(f"Available negative candidates after filtering: {len(available_negatives)}")
     
     # First, build a map from induceCommitHashList to fixCommitHashList within the allowed set
     anchor_to_positives_map = {}
@@ -84,10 +90,9 @@ def create_triplets_from_subset(
                 
                 # Try to find a valid negative candidate
                 negative = None
-                for neg_candidate in commit_hashes:
+                for neg_candidate in available_negatives:
                     # Skip if the candidate is the anchor, positive, or any known positive
-                    # or if it has been used as a negative before
-                    if neg_candidate in {anchor} | positive_candidates_for_anchor | used_negatives:
+                    if neg_candidate in {anchor} | positive_candidates_for_anchor:
                         continue
                         
                     # Get files modified by the negative candidate
@@ -97,6 +102,7 @@ def create_triplets_from_subset(
                     if not any(f in target_files or f in positive_files for f in neg_files):
                         negative = neg_candidate
                         used_negatives.add(neg_candidate)  # Mark this commit as used
+                        available_negatives.remove(neg_candidate)  # Remove from available candidates
                         break
 
                 if negative:
@@ -131,8 +137,6 @@ def main():
                         help="Output file for saving test triplets.")
     parser.add_argument('--test-size', type=float, default=0.2,
                         help="Proportion of the dataset to include in the test split.")
-    parser.add_argument('--random-seed', type=int, default=42,
-                        help="Random seed for reproducibility of data splitting.")
     parser.add_argument('--commit-hashes-file', type=str, required=True,
                         help="JSON file containing list of commit hashes for negative sampling.")
     parser.add_argument('--repo-path', type=str, default='.',
@@ -145,7 +149,6 @@ def main():
     train_output_file_path = args.train_output_file
     test_output_file_path = args.test_output_file
     test_size = args.test_size
-    random_seed = args.random_seed
     repo_path = args.repo_path
     remote_url = args.remote_url
 
@@ -167,8 +170,7 @@ def main():
     train_commit_hashes, test_commit_hashes = train_test_split(
         all_unique_commits_list,
         test_size=test_size,
-        train_size=1-test_size,
-        random_state=random_seed
+        train_size=1-test_size
     )
 
     # Convert back to sets for faster lookups in create_triplets_from_subset
@@ -187,10 +189,15 @@ def main():
         bic_bfc_unique_commits,     # Negative candidates can be from the entire pool
         commit_hashes,          # Additional negative candidates
         repo_path,              # Path to git repository
-        remote_url              # Remote URL for git repository
+        remote_url,             # Remote URL for git repository
+        used_negatives=set()    # Start with empty set of used negatives
     )
     save_triplets(train_triplets, train_output_file_path)
     print(f"Created {len(train_triplets)} training triplets and saved to {train_output_file_path}")
+
+    # Get the set of negatives used in training
+    train_used_negatives = {t[2] for t in train_triplets}
+    print(f"Number of unique negatives used in training: {len(train_used_negatives)}")
 
     # --- Generate Triplet Data for Test Set ---
     print("\nGenerating test triplets...")
@@ -200,10 +207,21 @@ def main():
         bic_bfc_unique_commits,    # Negative candidates can be from the entire pool
         commit_hashes,         # Additional negative candidates
         repo_path,             # Path to git repository
-        remote_url             # Remote URL for git repository
+        remote_url,            # Remote URL for git repository
+        used_negatives=train_used_negatives   # Pass the set of negatives used in training
     )
     save_triplets(test_triplets, test_output_file_path)
     print(f"Created {len(test_triplets)} test triplets and saved to {test_output_file_path}")
+
+    # Verify no overlap in negatives between train and test
+    train_used_negatives = {t[2] for t in train_triplets}
+    test_used_negatives = {t[2] for t in test_triplets}
+    print(f"\nDebug info:")
+    print(f"Number of unique negatives in training: {len(train_used_negatives)}")
+    print(f"Number of unique negatives in test: {len(test_used_negatives)}")
+    overlap = train_used_negatives.intersection(test_used_negatives)
+    print(f"\nOverlap check - Negatives used in both train and test: {len(overlap)} (should be 0)")
+    print("Overlapping negatives:", overlap)
 
     print("\nSample Training Triplet:")
     if train_triplets:
