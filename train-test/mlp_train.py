@@ -5,27 +5,30 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
 import torch.nn as nn
-import sqlite3
-import pickle
 import matplotlib.pyplot as plt
 from triplet_dataset import TripleCommitDataset
 from mlp import MLPEmbedding
-from early_stopping import EarlyStopping
 import argparse
+import chromadb
 
-def get_embedding(commit_hash, cursor):
-    """
-    Retrieves and deserializes an embedding for a given commit hash from the database.
-    """
-    cursor.execute("SELECT embedding FROM embeddings WHERE commit_hash = ?", (commit_hash,))
-    result = cursor.fetchone()
-    if result:
-        # result[0] contains the BLOB data, deserialize it with pickle
-        return pickle.loads(result[0])
-    else:
-        # Handle cases where a commit hash might not be in the database
-        print(f"Warning: Commit hash '{commit_hash}' not found in the database.")
-        return None # Or return a zero vector: np.zeros(embedding_dim)
+def get_embedding(commit_hash, collection):
+    try:
+        results = collection.get(
+            ids=[commit_hash],        # Filter by specific ID
+            include=['embeddings'] # What to retrieve
+            )
+        if results and results['ids'] and len(results['ids']) > 0:
+            retrieved_id = results['ids'][0]
+            retrieved_embedding = results['embeddings'][0]
+            return retrieved_embedding
+        else:
+            print(f"No commits found with commit hash = {commit_hash}.")
+            return None
+    except Exception as e:
+        print(f"An error occurred during retrieval of commit hash {commit_hash}: {e}")
+        return None
+        
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description= "Arguments required for training MLP")
@@ -35,6 +38,7 @@ if __name__ == "__main__":
     parser.add_argument('--train-triplets', type=str, required=True, help= 'Path of JSON file that stores list of triplets for training')
     parser.add_argument('--test-triplets', type=str, required=True, help= 'Path of JSON file that stores list of triplets for testing')
     parser.add_argument('--db-path', type=str, required=True, help= 'Path of database that stores commit embeddings')
+    parser.add_argument('--collection-name', type=str, required=True, help= 'Name of collection that stores the commit embeddings')
     parser.add_argument('--epochs', type=int, required=True, help= 'Number of epochs for training')
     parser.add_argument('--patience', type=int, default=10, help= 'Number of epochs to wait before early stopping')
     parser.add_argument('--min-delta', type=float, default=0.001, help= 'Minimum delta for early stopping')
@@ -66,6 +70,20 @@ if __name__ == "__main__":
     positives_test = [entry['positive'] for entry in triplets_test_data]
     negatives_test = [entry['negative'] for entry in triplets_test_data]
 
+    #  Initialize ChromaDB Client
+    print(f"Connecting to ChromaDB persistent client at: {args.db_path}")
+    client = chromadb.PersistentClient(path=args.db_path)
+
+    # --- 2. Get the Collection ---
+    print(f"Getting collection: '{args.collection_name}'")
+    try:
+        collection = client.get_collection(name=args.collection_name)
+        print(f"Collection '{args.collection_name}' loaded. Total items: {collection.count()}")
+    except Exception as e:
+        print(f"Error getting collection '{args.collection_name}': {e}")
+        print("Please ensure the collection exists and the path is correct.")
+        exit()
+
     # Initialize lists to store the retrieved embeddings
     anchors_train_embeddings = []
     positives_train_embeddings = []
@@ -77,28 +95,26 @@ if __name__ == "__main__":
 
     # Obtaining embeddings from database
     try:
-    # --- Connect to the SQLite database ---
-        conn = sqlite3.connect(args.db_path)
-        cursor = conn.cursor()
+    # --- Connect to the ChromaDB database ---
 
         # --- Fetch embeddings for each commit hash ---
         print("Fetching train anchor embeddings...")
-        anchors_train_embeddings = [get_embedding(anchor, cursor) for anchor in anchors_train]
+        anchors_train_embeddings = [get_embedding(anchor, collection) for anchor in anchors_train]
 
         print("Fetching train positive embeddings...")
-        positives_train_embeddings = [get_embedding(pos, cursor) for pos in positives_train]
+        positives_train_embeddings = [get_embedding(pos, collection) for pos in positives_train]
 
         print("Fetching train negative embeddings...")
-        negatives_train_embeddings = [get_embedding(neg, cursor) for neg in negatives_train]
+        negatives_train_embeddings = [get_embedding(neg, collection) for neg in negatives_train]
         
         print("Fetching test anchor embeddings...")
-        anchors_test_embeddings = [get_embedding(anchor, cursor) for anchor in anchors_test]
+        anchors_test_embeddings = [get_embedding(anchor, collection) for anchor in anchors_test]
 
         print("Fetching test positive embeddings...")
-        positives_test_embeddings = [get_embedding(pos, cursor) for pos in positives_test]
+        positives_test_embeddings = [get_embedding(pos, collection) for pos in positives_test]
 
         print("Fetching test negative embeddings...")
-        negatives_test_embeddings = [get_embedding(neg, cursor) for neg in negatives_test]
+        negatives_test_embeddings = [get_embedding(neg, collection) for neg in negatives_test]
     
 
         # Optional: Filter out any 'None' values if hashes were not found
