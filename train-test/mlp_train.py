@@ -43,6 +43,7 @@ if __name__ == "__main__":
     parser.add_argument('--patience', type=int, default=10, help= 'Number of epochs to wait before early stopping')
     parser.add_argument('--min-delta', type=float, default=0.001, help= 'Minimum delta for early stopping')
     parser.add_argument('--loss-graph-path', type=str, required=True, help= 'Path to store the resulting loss graph')
+    
     args = parser.parse_args()
 
     epochs = args.epochs
