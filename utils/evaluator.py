@@ -1,36 +1,31 @@
 import json
 from get_modified_files import get_modified_files_from_commit
 from tqdm import tqdm
+from typing import List
+import argparse
+import glob
 
-# Path to the sid.json file
-SID_JSON_PATH = 'data/bic_bfc_pairs/hive/sid.json'
-OUTPUT_JSON_PATH = 'eval_results/hive/hive_compressed_eval_results.json'
-REPO_PATH = '.'  # Change if your repo is elsewhere
-REMOTE_URL = 'https://github.com/apache/hive.git'  # Set if you want to fetch from a remote
-REMOTE_NAME = 'external_source'
-EVAL_JSON_PATH = 'recommendation_results/hive_compressed_file_recommendation_sid.json'  # Set the correct path
 
-def get_ground_truth(data):
+def load_data_from_patterns(patterns: List[str]) -> List[dict]:
+    all_data = []
+    for pattern in patterns:
+        matching_files = glob.glob(pattern)
+        for file_path in matching_files:
+            try:
+                with open(file_path, 'r') as f:
+                    data = json.load(f)
+                all_data.extend(data)
+            except Exception as e:
+                print(f"Error loading {file_path}: {e}")
+    return all_data
 
-    for entry in tqdm(data, desc="Obtaining actual target files"):
-        # Get queryFiles from induceCommitHashList
-        query_files = set()
-        for commit_hash in entry.get('induceCommitHashList', []):
-            files = get_modified_files_from_commit(commit_hash, repo_path=REPO_PATH, remote_url=REMOTE_URL, remote_name=REMOTE_NAME)
-            if files:
-                query_files.update(files)
-        entry['queryFiles'] = sorted(list(query_files))
+def map_inducing_commits_to_target(data):
+    mapping = {}
+    for entry in data:
+        for induce_hash in entry.get("induceCommitHashList", []):
+            mapping[induce_hash] = entry.get("expectedOutcomeSet", [])
+    return mapping
 
-        # Get targetFiles from fixCommitHashList, excluding queryFiles
-        target_files = set()
-        for commit_hash in entry.get('fixCommitHashList', []):
-            files = get_modified_files_from_commit(commit_hash, repo_path=REPO_PATH, remote_url=REMOTE_URL, remote_name=REMOTE_NAME)
-            if files:
-                target_files.update(files)
-        # Remove files already in queryFiles
-        target_files = target_files - query_files
-        entry['targetFiles'] = sorted(list(target_files))
-    return data
 
 def compute_metrics(recommended, actual):
     recommended_set = set(recommended)
@@ -51,44 +46,49 @@ def compute_metrics(recommended, actual):
     return precision, recall, f1, ap
 
 if __name__ == '__main__':
-    with open(SID_JSON_PATH, 'r') as f:
-        data = json.load(f)
+    parser = argparse.ArgumentParser(description='Find similar commits based on embeddings.')
+    parser.add_argument('--input-path', type=str, required=True,
+                      help='Path of the evaluated recommendation')
+    parser.add_argument('--output-path', type=str, required=True,
+                      help='Path to evaluation result')
+    parser.add_argument('--repo-name', type=str, required=True,
+                      help='Name of the repository')
 
-    with open(EVAL_JSON_PATH, 'r') as f:
+    args = parser.parse_args()
+    input_patterns = [f'data/{args.repo_name}/sid.json', f'data/{args.repo_name}/mid.json']
+    data = load_data_from_patterns(input_patterns)
+    print(f"Loaded {len(data)} query data from input patterns.")
+
+    with open(args.input_path, 'r') as f:
         eval_data = json.load(f)
 
-    ground_truth = get_ground_truth(data)
-    # Build a mapping from induceCommitHashList (as tuple) to targetFiles
-    commit_to_target = {}
-    for entry in tqdm(ground_truth, desc='Build a mapping from induceCommitHashList to targetFiles'):
-        # Use tuple of induceCommitHashList as key
-        key = tuple(entry.get('induceCommitHashList', []))
-        commit_to_target[key] = set(entry.get('targetFiles', []))
+    commit_to_target = map_inducing_commits_to_target(data)
 
     precisions, recalls, f1s = [], [], []
     aps = []
     for entry in eval_data:
         query_commit = entry.get('queryCommit')
-        recommended_files = [f['file_name'] for f in entry.get('recommendedFiles', []) if 'file_name' in f]
+        recommended_files = [f['file'] for f in entry.get('recommendedFiles', []) if 'file' in f]
+        #print(f"Processing commit {query_commit}")
+        #print(f"Recommended files: {recommended_files}")
         # Find the ground truth entry with matching induceCommitHashList
         found = False
         for induce_commits, target_files in commit_to_target.items():
-            if query_commit in induce_commits:
+            if query_commit == induce_commits:
                 actual_files = target_files
                 found = True
                 break
         if not found:
             # No ground truth for this query_commit
             continue
+        #print(f"Actual files: {actual_files}")
         precision, recall, f1, ap = compute_metrics(recommended_files, actual_files)
         precisions.append(precision)
         recalls.append(recall)
         f1s.append(f1)
         aps.append(ap)
-        print(f"QueryCommit: {query_commit}\n  Precision: {precision:.3f}, Recall: {recall:.3f}, F1: {f1:.3f}, AP: {ap:.3f}")
+        #print(f"QueryCommit: {query_commit}\n  Precision: {precision:.3f}, Recall: {recall:.3f}, F1: {f1:.3f}, AP: {ap:.3f}")
 
-    with open(OUTPUT_JSON_PATH, 'w') as f:
-        json.dump(ground_truth, f, indent=4)
 
     if precisions:
         avg_precision = sum(precisions) / len(precisions)
@@ -99,6 +99,17 @@ if __name__ == '__main__':
         print(f"Average Recall: {avg_recall:.3f}")
         print(f"Average F1: {avg_f1:.3f}")
         print(f"Mean Average Precision (MAP): {map_score:.3f}")
+
+        eval_result = {
+            "Average Precision": round(avg_precision, 3),
+            "Average Recall": round(avg_recall, 3),
+            "Average F1": round(avg_f1, 3),
+            "Mean Average Precision (MAP)": round(map_score, 3)
+        }
+
+
+        with open(args.output_path, 'w') as f:
+            json.dump(eval_result, f, indent=4)
     else:
         print("No matching ground truth found for any queryCommit.")
 

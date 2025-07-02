@@ -88,3 +88,12 @@ def get_modified_files_from_commit(commit_hash: str, repo_path: str = '.', remot
     finally:
         os.chdir(original_cwd) # Always return to the original working directory
 
+def get_modified_files_from_matrix(commit_hash:str, matrix: dict[str, any]):
+    changed_files = []
+    idx = matrix['commitIndex'].index(commit_hash)
+    for category in ['modify', 'add', 'rename', 'delete']:
+        for item in matrix[category][idx]:
+            changed_files.append(item)
+
+    return changed_files
+
