@@ -1,4 +1,14 @@
 .venv/
+.myenv/
 data/
 chromadb/
 results/
+parameters/
+scripts/
+notebooks/
+__pycache__/
+logs/
+recommendation_results/
+
+
+
