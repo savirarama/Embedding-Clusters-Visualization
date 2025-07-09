@@ -4,6 +4,7 @@ from tqdm import tqdm
 from typing import List
 import argparse
 import glob
+import os
 
 
 def load_data_from_patterns(patterns: List[str]) -> List[dict]:
@@ -19,11 +20,18 @@ def load_data_from_patterns(patterns: List[str]) -> List[dict]:
                 print(f"Error loading {file_path}: {e}")
     return all_data
 
-def map_inducing_commits_to_target(data):
+def map_inducing_commits_to_target(data, repo):
     mapping = {}
     for entry in data:
+        expexted_file_path = ""
         for induce_hash in entry.get("induceCommitHashList", []):
-            mapping[induce_hash] = entry.get("expectedOutcomeSet", [])
+            expected_file_paths = glob.glob(f"../GitCF/experiment_data/ishida/{repo}/*/{entry.get("fixIssueID")}/_expected.json")
+            for file_path in expected_file_paths:
+                if os.path.exists(file_path):
+                    expected_file_path = file_path
+                    break
+            expected_files = json.load(open(expected_file_path, 'r'))
+            mapping[induce_hash] = expected_files
     return mapping
 
 
@@ -35,58 +43,55 @@ def compute_metrics(recommended, actual):
     recall = true_positives / len(actual_set) if actual_set else 0.0
     f1 = 2 * precision * recall / (precision + recall) if (precision + recall) > 0 else 0.0
 
-    # Average Precision (AP) calculation
+    return precision, recall, f1
+
+def compute_average_precision(recommended, actual):
     ap = 0.0
     hit_count = 0
     for idx, file in enumerate(recommended):
-        if file in actual_set:
+        if file in actual:
             hit_count += 1
             ap += hit_count / (idx + 1)
-    ap = ap / len(actual_set) if actual_set else 0.0
-    return precision, recall, f1, ap
+    ap = ap / len(actual) if actual else 0.0
+    return ap
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Find similar commits based on embeddings.')
-    parser.add_argument('--input-path', type=str, required=True,
-                      help='Path of the evaluated recommendation')
+    # parser.add_argument('--input-path', type=str, required=True,
+    #                   help='Path of the evaluated recommendation')
+    parser.add_argument('--recommendation-file-name', type=str, required=True,
+                      help='File name of recommendation list')
     parser.add_argument('--output-path', type=str, required=True,
                       help='Path to evaluation result')
     parser.add_argument('--repo-name', type=str, required=True,
                       help='Name of the repository')
+    parser.add_argument('--n', type=int, required=True,
+                      help='Number of recommended files')
 
     args = parser.parse_args()
-    input_patterns = [f'data/{args.repo_name}/sid.json', f'data/{args.repo_name}/mid.json']
+    input_patterns = [f'data/{args.repo_name}/sid.json', f'data/{args.repo_name}/mid_single.json']
     data = load_data_from_patterns(input_patterns)
     print(f"Loaded {len(data)} query data from input patterns.")
 
-    with open(args.input_path, 'r') as f:
-        eval_data = json.load(f)
+    # with open(args.input_path, 'r') as f:
+    #     eval_data = json.load(f)
 
-    commit_to_target = map_inducing_commits_to_target(data)
+    commit_to_target = map_inducing_commits_to_target(data, args.repo_name)
 
     precisions, recalls, f1s = [], [], []
     aps = []
-    for entry in eval_data:
-        query_commit = entry.get('queryCommit')
-        recommended_files = [f['file'] for f in entry.get('recommendedFiles', []) if 'file' in f]
-        #print(f"Processing commit {query_commit}")
-        #print(f"Recommended files: {recommended_files}")
-        # Find the ground truth entry with matching induceCommitHashList
-        found = False
-        for induce_commits, target_files in commit_to_target.items():
-            if query_commit == induce_commits:
-                actual_files = target_files
-                found = True
-                break
-        if not found:
-            # No ground truth for this query_commit
-            continue
-        #print(f"Actual files: {actual_files}")
-        precision, recall, f1, ap = compute_metrics(recommended_files, actual_files)
-        precisions.append(precision)
-        recalls.append(recall)
-        f1s.append(f1)
-        aps.append(ap)
+    for entry in data:
+        query_commits = entry.get('induceCommitHashList')
+        for query_commit in query_commits:
+            recommended_files_info = json.load(open(f"data/{args.repo_name}/recommendation/{query_commit}_{args.recommendation_file_name}",'r'))
+            recommended_files = [entry['file'] for entry in recommended_files_info]
+            actual_files = commit_to_target[query_commit]
+            precision, recall, f1 = compute_metrics(recommended_files[:args.n], actual_files)
+            mean_ap = compute_average_precision(recommended_files, actual_files)
+            precisions.append(precision)
+            recalls.append(recall)
+            f1s.append(f1)
+            aps.append(mean_ap)
         #print(f"QueryCommit: {query_commit}\n  Precision: {precision:.3f}, Recall: {recall:.3f}, F1: {f1:.3f}, AP: {ap:.3f}")
 
 
