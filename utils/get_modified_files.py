@@ -1,7 +1,8 @@
 import subprocess
 import json
 import os
-import re # Added for parsing web URLs if needed
+import re 
+import glob
 
 def get_modified_files_from_commit(commit_hash: str, repo_path: str = '.', remote_url: str = None, remote_name: str = 'external_source') -> list | None:
     original_cwd = os.getcwd()
@@ -88,12 +89,22 @@ def get_modified_files_from_commit(commit_hash: str, repo_path: str = '.', remot
     finally:
         os.chdir(original_cwd) # Always return to the original working directory
 
-def get_modified_files_from_matrix(commit_hash:str, matrix: dict[str, any]):
-    changed_files = []
-    idx = matrix['commitIndex'].index(commit_hash)
-    for category in ['modify', 'add', 'rename', 'delete']:
-        for item in matrix[category][idx]:
-            changed_files.append(item)
+def get_modified_files_from_matrix(commit_hash: str, repo: str):
+    patterns = [f"../GitCF/experiment_data/ishida/{repo}/sid/*/_matrix.json", f"../GitCF/experiment_data/ishida/{repo}/mid_single/*/_matrix.json"]
+    matrix_paths = []
+    for pattern in patterns:
+        matrix_paths.extend(glob.glob(pattern))
 
+    changed_files = []
+    for matrix_path in matrix_paths:
+        with open(matrix_path, 'r') as f:
+            matrix = json.load(f)
+        if commit_hash in matrix["commitIndex"]:
+            idx = matrix["commitIndex"].index(commit_hash)
+            for key in matrix["matrix"][idx].keys():
+                changed_files.append(int(key))
+            return changed_files
     return changed_files
+
+
 
