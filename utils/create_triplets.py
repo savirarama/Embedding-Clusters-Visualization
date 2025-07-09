@@ -33,6 +33,8 @@ def create_triplets_from_subset(
     allowed_commit_hashes: Set[str], # This parameter must be passed
     commit_hashes: List[str],
     repo: str,
+    consider_label: bool,
+    commit_to_label_map: dict,
     used_negatives: Set[str] = None 
 ) -> List[Tuple[str, str, str]]:
     triplets = []
@@ -75,6 +77,7 @@ def create_triplets_from_subset(
         if anchor in anchor_to_positives_map: # Check if this anchor actually has positive pairs
             positive_candidates_for_anchor = anchor_to_positives_map[anchor]
             target_files = anchor_to_target_files_map.get(anchor, set()) 
+            anchor_label = commit_to_label_map[anchor]
 
             for positive in positive_candidates_for_anchor:
                 # Get files modified by the positive commit
@@ -85,8 +88,12 @@ def create_triplets_from_subset(
                 # Iterate over a copy of available_negatives, remove from original
                 for neg_candidate in list(available_negatives): 
                     # Skip if the candidate is the anchor, positive, or any known positive
-                    if neg_candidate in {anchor} | positive_candidates_for_anchor:
-                        continue
+                    if consider_label:
+                        if (neg_candidate in {anchor} | positive_candidates_for_anchor) or (commit_to_label_map[neg_candidate] == anchor_label):
+                            continue
+                    else:
+                        if neg_candidate in {anchor} | positive_candidates_for_anchor:
+                            continue
                         
                     # Get files modified by the negative candidate
                     neg_files = get_modified_files_from_matrix(neg_candidate, repo) or []
@@ -126,6 +133,8 @@ def main():
                         help="Proportion of the dataset to include in the validation split.")
     parser.add_argument('--repo-name', type=str, required=True,
                         help="Repository name")
+    parser.add_argument('--consider-label', action='store_true',
+                        help="Consider commit label when selecting negative samples")        
     parser.add_argument('--random-seed', type=int, default=42,
                     help="Random seed for reproducibility.")
     args = parser.parse_args()
@@ -138,6 +147,15 @@ def main():
     # Load the commit hashes for negative sampling
     with open(f"data/{args.repo_name}/commit_hashes.json", 'r') as f:
         commit_hashes = json.load(f)
+
+    # Load commit labels
+    with open(f"data/{args.repo_name}/labels.json", 'r') as f:
+        labels = json.load(f)
+
+    commit_to_label_map = {}
+
+    for commit in commit_hashes:
+        commit_to_label_map[commit] = labels[commit_hashes.index(commit)]
     
     input_patterns = [f'../GitCF/experiment_data/ishida/{args.repo_name}/sid.json', f'../GitCF/experiment_data/ishida/{args.repo_name}/mid_single.json']
 
@@ -186,6 +204,8 @@ def main():
         allowed_commit_hashes=train_commit_hashes,     
         commit_hashes=commit_hashes,          
         repo=args.repo_name,
+        consider_label = args.consider_label,
+        commit_to_label_map = commit_to_label_map,
         used_negatives=set()   
     )
     save_triplets(train_triplets, train_output_file_path)
@@ -199,11 +219,13 @@ def main():
         allowed_commit_hashes=val_commit_hashes,     # Negative candidates from entire pool
         commit_hashes=commit_hashes,            # Additional repository-wide negative candidates
         repo=args.repo_name,
+        consider_label = args.consider_label,
+        commit_to_label_map = commit_to_label_map,
         used_negatives=train_used_negatives     # Pass used negatives from training
     )
 
     save_triplets(val_triplets, val_output_file_path)
-    print(f"Created {len(val_triplets)} test triplets and saved to {val_output_file_path}")
+    print(f"Created {len(val_triplets)} validation triplets and saved to {val_output_file_path}")
 
     val_used_negatives = train_used_negatives | {t[2] for t in val_triplets}
     print(f"Number of unique negatives used in training and validation: {len(val_used_negatives)}")
@@ -214,6 +236,8 @@ def main():
         allowed_commit_hashes=test_commit_hashes,        
         commit_hashes=commit_hashes,         
         repo=args.repo_name,
+        consider_label = args.consider_label,
+        commit_to_label_map = commit_to_label_map,
         used_negatives=val_used_negatives,   
     )
     save_triplets(test_triplets, test_output_file_path)
