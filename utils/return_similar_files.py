@@ -134,8 +134,7 @@ def find_similar_commits(commit_input_hash, n, commit_hashes, all_embeddings, si
         if current_group:
             grouped_commit_similarity_pairs.append(current_group)
         
-        print(f"Num of similar commits group: {len(grouped_commit_similarity_pairs)}")
-
+        #print(f"Num of similar commits group: {len(grouped_commit_similarity_pairs)}")
     # 5. Return top N commit hashes based on distinct ranks (groups)
     top_n_commits = []
     ranks_processed = 0
@@ -146,11 +145,11 @@ def find_similar_commits(commit_input_hash, n, commit_hashes, all_embeddings, si
         if ranks_processed >= n:
             break
 
-    return top_n_commits, grouped_commit_similarity_pairs[:n]
+    return top_n_commits, grouped_commit_similarity_pairs
 
-def get_recommended_files(query_hash, similar_commits, matrix, commit_hashes, n=10, w=1.0):
+def get_recommended_files(query_hash, similar_commits, repo, commit_hashes, w=1.0):
     # Get files modified in query commit
-    query_modified_files = get_modified_files_from_matrix(query_hash, matrix)
+    query_modified_files = get_modified_files_from_matrix(query_hash, repo)
     query_modified_files = set(query_modified_files)
     
     # Calculate total similarity for normalization
@@ -165,7 +164,7 @@ def get_recommended_files(query_hash, similar_commits, matrix, commit_hashes, n=
         commit_similarity = commit['similarity']
         
         # Get files modified in this commit
-        modified_files = get_modified_files_from_matrix(commit_hash, matrix)
+        modified_files = get_modified_files_from_matrix(commit_hash, repo)
 
         
         # Score each file in this commit
@@ -185,14 +184,13 @@ def get_recommended_files(query_hash, similar_commits, matrix, commit_hashes, n=
                    for file_path, score in file_scores.items()]
     scored_files.sort(key=lambda x: x['score'], reverse=True)
 
-    top_files = scored_files[:n]
     
-    for i, entry in enumerate(top_files):
+    for i, entry in enumerate(scored_files):
         entry['rank'] = i + 1
 
     
     # Return top n files
-    return top_files
+    return scored_files
 
 
 # --- Main execution ---
@@ -205,23 +203,21 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Find similar commits based on embeddings.')
     parser.add_argument('--npy-file', type=str, required=True,
                       help='Path to the .npy file containing commit embeddings')
-    parser.add_argument('--output-recommendations', type=str, required=True,
-                      help='Path to save recommendation results')
-    parser.add_argument('--output-commit-recommendations', type=str, required=True,
-                      help='Path to save commit recommendation results')
     parser.add_argument('--n-commits', type=int, default=80,
                       help='Number of top similar commits to retrieve')
     parser.add_argument('--n-files', type=int, default=10,
                       help='Number of top files to retrieve')
     parser.add_argument('--repo-name', type=str, required=True,
                       help='Name of the repository')
+    parser.add_argument('--output-filename', type=str, required=True,
+                      help='File name where file recommendation result is stored')
+    parser.add_argument('--output-commit-filename', type=str, required=True,
+                      help='File name where commit recommendation result is stored')
 
     args = parser.parse_args()
 
 
     # --- Configuration ---
-    save_results_path = args.output_recommendations
-    save_commit_results_path = args.output_commit_recommendations
     num_similar_commits = args.n_commits
     num_similar_files = args.n_files
 
@@ -233,10 +229,6 @@ if __name__ == "__main__":
     print("Loading commit data...")
     with open(f"data/{args.repo_name}/commit_hashes.json", 'r') as f:
         commit_hashes = json.load(f)
-
-    print("Loading matrix...")
-    with open(f"data/{args.repo_name}/base.json", 'r') as f:
-        matrix = json.load(f)
 
     print("Loading embeddings...")
     commit_embeddings = np.load(args.npy_file)
@@ -272,47 +264,32 @@ if __name__ == "__main__":
                 all_embeddings=commit_embeddings,
                 similarity_threshold=0.001
             )
-            #print(f"First similar commit group: {similar_commits_with_scores[0:5]}")
-            print(f"Num of similar commits group: {len(similar_commits_with_scores)}")
+            print(f"Num of ALL similar commits group: {len(grouped_commits)}")
             
             # Get recommended files based on similar commits
             recommended_files = get_recommended_files(
                 query_hash=query_hash,
                 similar_commits=similar_commits_with_scores,
                 commit_hashes=commit_hashes,
-                matrix=matrix,
-                n=num_similar_files
+                repo=args.repo_name
             )
             
-            # Store results
-            recommendation_results.append({
-                "queryCommit": query_hash,
-                "recommendedFiles": recommended_files
-            })
-            grouped_commits_recommendation.append({
-                "queryCommit": query_hash,
-                "recommendedCommits": grouped_commits
-            })
-            # Log the recommendations
-            logging.info(f"\nRecommendations for commit {query_hash}:")
-            # logging.info("Similar commits:")
-            # for commit in similar_commits_with_scores:
-            #     logging.info(f"Commit: {commit['hash']}, Similarity: {commit['similarity']:.4f}")
-            logging.info("\nRecommended files:")
-            for file_info in recommended_files:
-                logging.info(f"File: {file_info['file']}, Score: {file_info['score']:.4f}")
-            
-        # Save file recommendation results
-        os.makedirs(os.path.dirname(save_results_path), exist_ok=True)
-        with open(save_results_path, "w") as f:
-            json.dump(recommendation_results, f, indent=4)
-            logging.info(f"\n✔️ File recommendation results written to {save_results_path}")
 
-        # Save commit recommendation results
-        os.makedirs(os.path.dirname(save_commit_results_path), exist_ok=True)
-        with open(save_commit_results_path, "w") as f:
-            json.dump(grouped_commits_recommendation, f, indent=4)
-            logging.info(f"\n✔️ Commit recommendation results written to {save_commit_results_path}")
+            # Store result per commit hash
+            save_results_path = f"data/{args.repo_name}/recommendation/{query_hash}_{args.output_filename}"
+            save_commit_results_path = f"data/{args.repo_name}/recommendation/{query_hash}_{args.output_commit_filename}"
+            # Save commit recommendation results
+            os.makedirs(os.path.dirname(save_commit_results_path), exist_ok=True)
+            with open(save_commit_results_path, "w") as f:
+                json.dump(grouped_commits, f, indent=4)
+                logging.info(f"\n✔️ Commit recommendation results written to {save_commit_results_path}")
+            
+
+            # Save file recommendation results
+            os.makedirs(os.path.dirname(save_results_path), exist_ok=True)
+            with open(save_results_path, "w") as f:
+                json.dump(recommended_files, f, indent=4)
+                logging.info(f"\n✔️ File recommendation results written to {save_results_path}")
             
 
     else:
