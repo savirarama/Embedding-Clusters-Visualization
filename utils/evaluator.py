@@ -106,6 +106,7 @@ if __name__ == '__main__':
         print(f"Mean Average Precision (MAP): {map_score:.3f}")
 
         eval_result = {
+            "k": args.n,
             "Average Precision": round(avg_precision, 3),
             "Average Recall": round(avg_recall, 3),
             "Average F1": round(avg_f1, 3),
