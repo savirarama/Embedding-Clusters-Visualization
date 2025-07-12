@@ -159,7 +159,8 @@ def get_recommended_files(query_hash, similar_commits, repo, commit_hashes, w=1.
     file_scores = defaultdict(float)
     
     # Process each similar commit
-    for commit in tqdm(similar_commits, desc="Processing similar commits to get files"):
+    for commit in similar_commits:
+    #for commit in tqdm(similar_commits, desc="Processing similar commits to get files"):
         commit_hash = commit['hash']
         commit_similarity = commit['similarity']
         
@@ -250,7 +251,7 @@ if __name__ == "__main__":
         grouped_commits_recommendation = []
 
         # Process each query entry
-        for entry in query_entries:
+        for entry in tqdm(query_entries, desc="Processing each query commit:"):
             query_hash = entry["query"]
             target_hashes = entry["targets"]
 
